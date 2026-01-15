@@ -7,7 +7,7 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-    background-color: #f8fafc;
+    background-color: #f0f4f8;
     color: #1e293b;
     line-height: 1.6;
 }
@@ -19,15 +19,15 @@ body {
     flex-direction: column;
 }
 
-/* Header - Clean slate design */
+/* Header - Blue theme */
 .app-header {
-    background: #1e293b;
+    background: #2563eb;
     color: white;
     padding: 1rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
 }
 
 .app-header h1 {
@@ -40,7 +40,7 @@ body {
     gap: 0.5rem;
 }
 
-/* Buttons - Clean, minimal */
+/* Buttons - Clean, blue theme */
 .btn {
     padding: 0.5rem 1rem;
     border: none;
@@ -52,22 +52,22 @@ body {
 }
 
 .btn-primary {
-    background-color: #3b82f6;
+    background-color: #16a34a;
     color: white;
 }
 
 .btn-primary:hover {
-    background-color: #2563eb;
+    background-color: #15803d;
 }
 
 .btn-secondary {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.2);
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.3);
 }
 
 .btn-danger {
@@ -85,19 +85,19 @@ body {
 }
 
 .btn-view {
-    background-color: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
+    background-color: #e0e7ff;
+    color: #3730a3;
+    border: 1px solid #c7d2fe;
 }
 
 .btn-view:hover {
-    background-color: #e2e8f0;
+    background-color: #c7d2fe;
 }
 
 .btn-view.active {
-    background-color: #3b82f6;
+    background-color: #4f46e5;
     color: white;
-    border-color: #3b82f6;
+    border-color: #4f46e5;
 }
 
 /* Main Content */
@@ -144,8 +144,8 @@ body {
 }
 
 .trainee-item:hover {
-    background: #f1f5f9;
-    border-color: #e2e8f0;
+    background: #eff6ff;
+    border-color: #bfdbfe;
 }
 
 .trainee-color {
@@ -180,9 +180,9 @@ body {
 .trainee-week-label {
     font-size: 0.65rem;
     font-weight: 600;
-    color: #64748b;
+    color: #3b82f6;
     margin-top: 0.4rem;
-    background: #f1f5f9;
+    background: #eff6ff;
     padding: 0.15rem 0.4rem;
     border-radius: 3px;
     display: inline-block;
@@ -223,8 +223,8 @@ body {
 .hours-total-badge {
     font-size: 0.65rem;
     font-weight: 600;
-    color: #475569;
-    background: #f1f5f9;
+    color: #3b82f6;
+    background: #eff6ff;
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
 }
@@ -286,7 +286,7 @@ body {
     gap: 1rem;
 }
 
-/* Navigation Controls - Clean chevron design */
+/* Navigation Controls - Clean SVG icons */
 .timetable-controls {
     display: flex;
     align-items: center;
@@ -295,25 +295,27 @@ body {
 
 .btn-nav {
     background: white;
-    color: #475569;
-    border: 1px solid #e2e8f0;
+    color: #3b82f6;
+    border: 1px solid #bfdbfe;
     width: 36px;
     height: 36px;
-    border-radius: 6px;
-    font-size: 1.25rem;
-    font-weight: 300;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    line-height: 1;
+    padding: 0;
 }
 
 .btn-nav:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-    color: #1e293b;
+    background: #eff6ff;
+    border-color: #3b82f6;
+}
+
+.btn-nav svg {
+    width: 16px;
+    height: 16px;
 }
 
 .current-period {
@@ -330,30 +332,30 @@ body {
     gap: 0.25rem;
 }
 
-/* Current Date/Time Display - Clean design */
+/* Current Date/Time Display - Blue theme */
 .current-datetime {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 0.75rem;
-    background: #f1f5f9;
+    background: #eff6ff;
     border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #bfdbfe;
 }
 
 .current-date-label {
     font-size: 0.8rem;
-    color: #475569;
+    color: #1e40af;
 }
 
 .current-time-label {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #1e293b;
+    color: #1e40af;
     background: white;
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #bfdbfe;
 }
 
 .timetable-container {
@@ -400,7 +402,7 @@ body {
 }
 
 .timetable td:hover {
-    background-color: #f8fafc;
+    background-color: #eff6ff;
 }
 
 .timetable td.time-cell {
@@ -521,7 +523,7 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Session Type Colors - Muted, professional */
+/* Session Type Colors - Blue-based palette */
 .session-type-training {
     background: #3b82f6;
 }
@@ -688,7 +690,7 @@ form {
 }
 
 .month-header-cell.week-header {
-    background: #475569;
+    background: #3b82f6;
     color: white;
     font-size: 0.75rem;
 }
@@ -708,7 +710,7 @@ form {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #475569;
+    background: #3b82f6;
     color: white;
     font-weight: 600;
     font-size: 0.75rem;
@@ -726,7 +728,7 @@ form {
 }
 
 .month-day-cell:hover:not(.empty):not(.weekend):not(.holiday) {
-    background: #f8fafc;
+    background: #eff6ff;
 }
 
 .month-day-cell.empty {
@@ -765,7 +767,7 @@ form {
     transform: none;
 }
 
-/* Current Day (Today) Highlighting - Subtle, clean */
+/* Current Day (Today) Highlighting - Blue theme */
 .month-day-cell.today {
     border: 2px solid #3b82f6;
     background: #eff6ff;
@@ -909,20 +911,19 @@ form {
 
 .add-booking-btn {
     font-size: 0.65rem;
-    color: #64748b;
+    color: #3b82f6;
     cursor: pointer;
     padding: 0.2rem;
     text-align: center;
-    border: 1px dashed #cbd5e1;
+    border: 1px dashed #bfdbfe;
     border-radius: 4px;
     margin-top: 0.25rem;
     transition: all 0.15s ease;
 }
 
 .add-booking-btn:hover {
-    background: #f8fafc;
-    border-color: #94a3b8;
-    color: #475569;
+    background: #eff6ff;
+    border-color: #3b82f6;
 }
 
 .form-hint {
