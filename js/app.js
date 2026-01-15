@@ -8,6 +8,8 @@ const state = {
     trainees: [],
     sessions: [],
     currentWeekStart: getWeekStart(new Date()),
+    currentMonth: new Date(),
+    currentView: 'week', // 'week' or 'month'
     editingTraineeId: null,
     editingSessionId: null
 };
@@ -23,23 +25,82 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 // Weekend days (non-editable)
 const WEEKEND_DAYS = [5, 6]; // Saturday = 5, Sunday = 6
 
-// Bulgarian Public Holidays 2026
+// Bulgarian Public Holidays 2026 with descriptions
 const HOLIDAYS_2026 = {
-    '2026-01-01': { name: 'New Year', short: 'NY' },
-    '2026-03-03': { name: 'Liberation Day', short: 'LD' },
-    '2026-04-17': { name: 'Good Friday', short: 'GF' },
-    '2026-04-18': { name: 'Holy Saturday', short: 'HS' },
-    '2026-04-19': { name: 'Easter Sunday', short: 'ES' },
-    '2026-04-20': { name: 'Easter Monday', short: 'EM' },
-    '2026-05-01': { name: 'Labour Day', short: 'LabD' },
-    '2026-05-06': { name: "St. George's Day", short: 'SGD' },
-    '2026-05-24': { name: 'Education Day', short: 'ED' },
-    '2026-09-06': { name: 'Unification Day', short: 'UD' },
-    '2026-09-22': { name: 'Independence Day', short: 'ID' },
-    '2026-12-24': { name: 'Christmas Eve', short: 'CE' },
-    '2026-12-25': { name: 'Christmas Day', short: 'XM' },
-    '2026-12-26': { name: 'Christmas Day 2', short: 'XM2' }
+    '2026-01-01': {
+        name: 'New Year\'s Day',
+        short: 'NY',
+        description: 'Celebrates the beginning of the new calendar year. Bulgarians welcome the new year with festive gatherings, fireworks, and traditional meals.'
+    },
+    '2026-03-03': {
+        name: 'Liberation Day',
+        short: 'LD',
+        description: 'Bulgaria\'s National Day commemorating liberation from Ottoman rule in 1878. The Treaty of San Stefano ended nearly 500 years of Ottoman domination.'
+    },
+    '2026-04-17': {
+        name: 'Good Friday',
+        short: 'GF',
+        description: 'Orthodox Christian holy day marking the crucifixion of Jesus Christ. A solemn day of fasting and reflection before Easter.'
+    },
+    '2026-04-18': {
+        name: 'Holy Saturday',
+        short: 'HS',
+        description: 'The day between Good Friday and Easter Sunday. Bulgarians prepare Easter eggs and traditional kozunak bread.'
+    },
+    '2026-04-19': {
+        name: 'Easter Sunday',
+        short: 'ES',
+        description: 'The most important Orthodox Christian holiday celebrating Christ\'s resurrection. Families gather for festive meals and egg-cracking traditions.'
+    },
+    '2026-04-20': {
+        name: 'Easter Monday',
+        short: 'EM',
+        description: 'Continuation of Easter celebrations. A day for family visits, sharing Easter meals, and enjoying the spring weather.'
+    },
+    '2026-05-01': {
+        name: 'Labour Day',
+        short: 'LabD',
+        description: 'International Workers\' Day celebrating the achievements of workers worldwide. Many Bulgarians enjoy outdoor activities and picnics.'
+    },
+    '2026-05-06': {
+        name: 'St. George\'s Day',
+        short: 'SGD',
+        description: 'Also known as Bulgarian Army Day. Honors St. George, patron saint of the military. Traditional lamb dishes are prepared on this day.'
+    },
+    '2026-05-24': {
+        name: 'Education & Culture Day',
+        short: 'ED',
+        description: 'Celebrates Saints Cyril and Methodius who created the Cyrillic alphabet. A day honoring Bulgarian education, culture, and Slavic heritage.'
+    },
+    '2026-09-06': {
+        name: 'Unification Day',
+        short: 'UD',
+        description: 'Commemorates the unification of Eastern Rumelia with the Principality of Bulgaria in 1885. A milestone in Bulgarian national unity.'
+    },
+    '2026-09-22': {
+        name: 'Independence Day',
+        short: 'ID',
+        description: 'Marks Bulgaria\'s declaration of full independence from the Ottoman Empire in 1908. Celebrated with official ceremonies and cultural events.'
+    },
+    '2026-12-24': {
+        name: 'Christmas Eve',
+        short: 'CE',
+        description: 'Badni Vecher - a sacred family evening with traditional meatless dinner of odd-numbered dishes. Families gather to share blessings.'
+    },
+    '2026-12-25': {
+        name: 'Christmas Day',
+        short: 'XM',
+        description: 'Celebrates the birth of Jesus Christ. Bulgarian Christmas traditions include caroling, festive meals, and family gatherings.'
+    },
+    '2026-12-26': {
+        name: 'Christmas Day 2',
+        short: 'XM2',
+        description: 'Second day of Christmas celebrations. Continued family visits, festive meals, and holiday traditions across Bulgaria.'
+    }
 };
+
+// View mode: 'week' or 'month'
+let currentView = 'week';
 
 // Function to check if a date is a holiday
 function getHoliday(date) {
@@ -58,10 +119,39 @@ document.addEventListener('DOMContentLoaded', init);
 
 function init() {
     loadData();
-    renderTimetable();
+    renderCurrentView();
     renderTraineeList();
-    updateWeekDisplay();
+    updatePeriodDisplay();
     bindEvents();
+}
+
+// Render based on current view
+function renderCurrentView() {
+    if (state.currentView === 'week') {
+        document.getElementById('weekView').classList.remove('hidden');
+        document.getElementById('monthView').classList.add('hidden');
+        renderTimetable();
+    } else {
+        document.getElementById('weekView').classList.add('hidden');
+        document.getElementById('monthView').classList.remove('hidden');
+        renderMonthView();
+    }
+}
+
+// Switch view mode
+function switchView(view) {
+    state.currentView = view;
+
+    // Update button states
+    document.getElementById('weekViewBtn').classList.toggle('active', view === 'week');
+    document.getElementById('monthViewBtn').classList.toggle('active', view === 'month');
+
+    // Update navigation labels
+    document.getElementById('prevLabel').textContent = view === 'week' ? 'Previous Week' : 'Previous Month';
+    document.getElementById('nextLabel').textContent = view === 'week' ? 'Next Week' : 'Next Month';
+
+    renderCurrentView();
+    updatePeriodDisplay();
 }
 
 // Data Persistence
@@ -149,8 +239,12 @@ function renderTimetable() {
                 if (timeIndex === 0) {
                     const holidayLabel = document.createElement('div');
                     holidayLabel.className = 'holiday-label';
-                    holidayLabel.innerHTML = `<span class="holiday-short">${holiday.short}</span>`;
-                    holidayLabel.title = holiday.name;
+                    holidayLabel.innerHTML = `
+                        <span class="holiday-short">${holiday.short}</span>
+                        <div class="holiday-name">${holiday.name}</div>
+                        <div class="holiday-desc">${holiday.description}</div>
+                    `;
+                    holidayLabel.title = holiday.description;
                     cell.appendChild(holidayLabel);
                 }
             }
@@ -203,6 +297,90 @@ function updateTableHeader() {
             th.classList.remove('holiday-header');
         }
     });
+}
+
+// Monthly View Rendering
+function renderMonthView() {
+    const container = document.getElementById('monthGrid');
+    const year = state.currentMonth.getFullYear();
+    const month = state.currentMonth.getMonth();
+
+    // Get first day of month and total days
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const totalDays = lastDay.getDate();
+    const startDayOfWeek = (firstDay.getDay() + 6) % 7; // Monday = 0
+
+    // Build calendar HTML
+    let html = '<div class="month-header-row">';
+    const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    dayNames.forEach((day, index) => {
+        const isWeekend = index >= 5;
+        html += `<div class="month-header-cell ${isWeekend ? 'weekend' : ''}">${day}</div>`;
+    });
+    html += '</div>';
+
+    html += '<div class="month-days-grid">';
+
+    // Empty cells before first day
+    for (let i = 0; i < startDayOfWeek; i++) {
+        html += '<div class="month-day-cell empty"></div>';
+    }
+
+    // Days of month
+    for (let day = 1; day <= totalDays; day++) {
+        const date = new Date(year, month, day);
+        const dayOfWeek = (date.getDay() + 6) % 7;
+        const isWeekend = dayOfWeek >= 5;
+        const holiday = getHoliday(date);
+
+        let cellClass = 'month-day-cell';
+        if (isWeekend) cellClass += ' weekend';
+        if (holiday) cellClass += ' holiday';
+
+        html += `<div class="${cellClass}">`;
+        html += `<div class="month-day-number ${holiday ? 'holiday-date' : ''}">${day}</div>`;
+
+        if (holiday) {
+            html += `<div class="month-holiday-info">`;
+            html += `<span class="month-holiday-badge">${holiday.short}</span>`;
+            html += `<div class="month-holiday-name">${holiday.name}</div>`;
+            html += `<div class="month-holiday-desc">${holiday.description}</div>`;
+            html += `</div>`;
+        }
+
+        // Show sessions count for this day (weekdays only, non-holidays)
+        if (!isWeekend && !holiday) {
+            const daySessions = getSessionsForDay(date);
+            if (daySessions.length > 0) {
+                html += `<div class="month-sessions-count">${daySessions.length} session${daySessions.length > 1 ? 's' : ''}</div>`;
+            }
+        }
+
+        html += '</div>';
+    }
+
+    // Empty cells after last day
+    const endDayOfWeek = (lastDay.getDay() + 6) % 7;
+    for (let i = endDayOfWeek + 1; i < 7; i++) {
+        html += '<div class="month-day-cell empty"></div>';
+    }
+
+    html += '</div>';
+
+    container.innerHTML = html;
+}
+
+// Get sessions for a specific date
+function getSessionsForDay(date) {
+    const weekStart = getWeekStart(date);
+    const weekKey = getWeekKey(weekStart);
+    const dayOfWeek = (date.getDay() + 6) % 7; // Monday = 0
+
+    return state.sessions.filter(s =>
+        s.week === weekKey &&
+        s.day === dayOfWeek
+    );
 }
 
 function formatTimeDisplay(time) {
@@ -263,8 +441,17 @@ function renderTraineeList() {
     `).join('');
 }
 
-function updateWeekDisplay() {
-    document.getElementById('currentWeek').textContent = formatWeekRange(state.currentWeekStart);
+function updatePeriodDisplay() {
+    const display = document.getElementById('currentPeriod');
+    if (state.currentView === 'week') {
+        display.textContent = formatWeekRange(state.currentWeekStart);
+    } else {
+        display.textContent = formatMonthYear(state.currentMonth);
+    }
+}
+
+function formatMonthYear(date) {
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
 function updateTraineeSelect() {
@@ -281,9 +468,13 @@ function bindEvents() {
     document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
     document.getElementById('importFile').addEventListener('change', importData);
 
-    // Week navigation
-    document.getElementById('prevWeekBtn').addEventListener('click', () => navigateWeek(-1));
-    document.getElementById('nextWeekBtn').addEventListener('click', () => navigateWeek(1));
+    // View toggle buttons
+    document.getElementById('weekViewBtn').addEventListener('click', () => switchView('week'));
+    document.getElementById('monthViewBtn').addEventListener('click', () => switchView('month'));
+
+    // Navigation (works for both week and month)
+    document.getElementById('prevBtn').addEventListener('click', () => navigate(-1));
+    document.getElementById('nextBtn').addEventListener('click', () => navigate(1));
 
     // Modal close buttons
     document.querySelectorAll('.modal-close, [data-modal]').forEach(btn => {
@@ -310,13 +501,19 @@ function bindEvents() {
     });
 }
 
-// Week Navigation
-function navigateWeek(direction) {
-    const newDate = new Date(state.currentWeekStart);
-    newDate.setDate(newDate.getDate() + (direction * 7));
-    state.currentWeekStart = newDate;
-    updateWeekDisplay();
-    renderTimetable();
+// Navigation (week or month)
+function navigate(direction) {
+    if (state.currentView === 'week') {
+        const newDate = new Date(state.currentWeekStart);
+        newDate.setDate(newDate.getDate() + (direction * 7));
+        state.currentWeekStart = newDate;
+    } else {
+        const newDate = new Date(state.currentMonth);
+        newDate.setMonth(newDate.getMonth() + direction);
+        state.currentMonth = newDate;
+    }
+    updatePeriodDisplay();
+    renderCurrentView();
 }
 
 // Trainee Management

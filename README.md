@@ -5,9 +5,11 @@ A simple web application for managing trainee schedules and timetables.
 ## Features
 
 - **Trainee Management**: Add, edit, and remove trainees
+- **Week/Month Views**: Toggle between weekly timetable and monthly calendar
 - **Timetable View**: Weekly timetable grid with time slots (Monday - Sunday)
+- **Monthly View**: Full month calendar with holiday details and session counts
 - **Weekend Display**: Saturday and Sunday visible in grey, non-editable
-- **Bulgarian Holidays 2026**: Public holidays marked in red, non-editable
+- **Bulgarian Holidays 2026**: Public holidays with detailed descriptions (1-2 sentences)
 - **Session Scheduling**: Schedule training sessions for trainees
 - **Color-coded Sessions**: Different colors for different session types
 - **Data Persistence**: Saves data locally in browser storage
@@ -45,6 +47,13 @@ trainee-timetable/
 Works in all modern browsers (Chrome, Firefox, Safari, Edge).
 
 ## Changelog
+
+### v1.3.0
+- **Feature**: Added Monthly View with full calendar display
+- Toggle between Week View and Month View with buttons
+- Holiday descriptions expanded to 1-2 sentences with historical context
+- Month view shows holiday badges, names, and full descriptions
+- Session counts displayed in monthly view for each day
 
 ### v1.2.0
 - **Feature**: Added Bulgarian public holidays for 2026

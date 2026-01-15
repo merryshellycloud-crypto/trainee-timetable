@@ -27,12 +27,16 @@
             </aside>
 
             <section class="timetable-section">
-                <div class="timetable-controls">
-                    <button id="prevWeekBtn" class="btn btn-small">&larr; Previous Week</button>
-                    <span id="currentWeek" class="current-week"></span>
-                    <button id="nextWeekBtn" class="btn btn-small">Next Week &rarr;</button>
+                <div class="view-toggle">
+                    <button id="weekViewBtn" class="btn btn-view active">Week View</button>
+                    <button id="monthViewBtn" class="btn btn-view">Month View</button>
                 </div>
-                <div class="timetable-container">
+                <div class="timetable-controls">
+                    <button id="prevBtn" class="btn btn-small">&larr; <span id="prevLabel">Previous Week</span></button>
+                    <span id="currentPeriod" class="current-week"></span>
+                    <button id="nextBtn" class="btn btn-small"><span id="nextLabel">Next Week</span> &rarr;</button>
+                </div>
+                <div class="timetable-container" id="weekView">
                     <table class="timetable" id="timetable">
                         <thead>
                             <tr>
@@ -50,6 +54,11 @@
                             <!-- Timetable rows will be rendered here -->
                         </tbody>
                     </table>
+                </div>
+                <div class="month-container hidden" id="monthView">
+                    <div class="month-grid" id="monthGrid">
+                        <!-- Monthly calendar will be rendered here -->
+                    </div>
                 </div>
             </section>
         </main>
