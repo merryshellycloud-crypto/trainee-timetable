@@ -373,6 +373,28 @@ function renderMonthView() {
     const numRows = Math.ceil(totalCells / 7);
 
     for (let row = 0; row < numRows; row++) {
+        // Check if this row has any days in the weekday columns (Mon-Fri, cols 0-4)
+        let hasWeekdays = false;
+        const rowStartDay = row === 0 ? 1 : (row * 7 - startDayOfWeek + 1);
+
+        for (let col = 0; col < 5; col++) { // Only check Mon-Fri (cols 0-4)
+            const dayForCol = row === 0 ? (col >= startDayOfWeek ? col - startDayOfWeek + 1 : 0) : (rowStartDay + col);
+            if (dayForCol >= 1 && dayForCol <= totalDays) {
+                hasWeekdays = true;
+                break;
+            }
+        }
+
+        // Skip this row if no weekdays have actual dates
+        if (!hasWeekdays) {
+            // Still need to advance currentDay for any weekend days in this row
+            for (let col = 0; col < 7; col++) {
+                if (row === 0 && col < startDayOfWeek) continue;
+                if (currentDay <= totalDays) currentDay++;
+            }
+            continue;
+        }
+
         // Calculate week number for first day of this row
         let weekNum;
         if (row === 0 && startDayOfWeek > 0) {
