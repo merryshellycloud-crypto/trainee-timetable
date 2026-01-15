@@ -11,6 +11,8 @@ A simple web application for managing trainee schedules and timetables.
 - **Day Booking**: Book training days for trainees with status tracking (planned/present)
 - **Training Hours**: Track daily hours (max 8/day) with weekly limit of 20 hours per trainee
 - **Past Date Protection**: Past dates are displayed in light grey and cannot be edited
+- **Current Day Highlight**: Today is visually highlighted in both week and month views
+- **Live Date/Time Display**: Current date and time shown above the calendar, updated every minute
 - **Weekend Display**: Saturday and Sunday visible in grey, non-editable
 - **Bulgarian Holidays 2026**: Public holidays with detailed descriptions (1-2 sentences)
 - **Session Scheduling**: Schedule training sessions for trainees
@@ -50,6 +52,16 @@ trainee-timetable/
 Works in all modern browsers (Chrome, Firefox, Safari, Edge).
 
 ## Changelog
+
+### v1.6.0
+- **Feature**: Current day highlighting in both week and month views
+- Today's date visually highlighted with purple border and gradient background
+- Day number displayed in a purple circle in monthly view
+- Today's column highlighted in weekly view (header and cells)
+- **Feature**: Live date and time display above the calendar
+- Shows current date in full format (e.g., "Wednesday, January 15, 2026")
+- Shows current time in 24-hour format (e.g., "14:30")
+- Time updates automatically every minute
 
 ### v1.5.0
 - **Feature**: Past dates are now protected from editing

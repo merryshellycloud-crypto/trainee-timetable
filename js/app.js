@@ -129,7 +129,11 @@ function init() {
     renderCurrentView();
     renderTraineeList();
     updatePeriodDisplay();
+    updateCurrentDateTime();
     bindEvents();
+
+    // Update time every minute
+    setInterval(updateCurrentDateTime, 60000);
 }
 
 // Render based on current view
@@ -243,10 +247,16 @@ function renderTimetable() {
             const cellDate = new Date(state.currentWeekStart);
             cellDate.setDate(cellDate.getDate() + dayIndex);
             const holiday = getHoliday(cellDate);
+            const isTodayDate = isToday(cellDate);
 
             // Add weekend class for styling
             if (isWeekend) {
                 cell.classList.add('weekend-cell');
+            }
+
+            // Add today class for highlighting
+            if (isTodayDate) {
+                cell.classList.add('today-cell');
             }
 
             // Add holiday class and annotation
@@ -299,10 +309,14 @@ function updateTableHeader() {
         cellDate.setDate(cellDate.getDate() + index);
         const dayNum = cellDate.getDate();
         const holiday = getHoliday(cellDate);
+        const isTodayDate = isToday(cellDate);
 
         // Clear existing content but keep classes
         const dayName = DAYS[index];
         const isWeekend = WEEKEND_DAYS.includes(index);
+
+        // Remove existing today class
+        th.classList.remove('today-header');
 
         if (holiday) {
             th.innerHTML = `${dayName}<br><span class="header-date holiday-date">${dayNum}</span>`;
@@ -312,6 +326,11 @@ function updateTableHeader() {
         } else {
             th.innerHTML = `${dayName}<br><span class="header-date">${dayNum}</span>`;
             th.classList.remove('holiday-header');
+        }
+
+        // Add today highlight
+        if (isTodayDate) {
+            th.classList.add('today-header');
         }
     });
 }
@@ -351,11 +370,13 @@ function renderMonthView() {
         const isWeekend = dayOfWeek >= 5;
         const holiday = getHoliday(date);
         const isPast = isPastDate(date);
+        const isTodayDate = isToday(date);
 
         let cellClass = 'month-day-cell';
         if (isWeekend) cellClass += ' weekend';
         if (holiday) cellClass += ' holiday';
         if (isPast) cellClass += ' past-day';
+        if (isTodayDate) cellClass += ' today';
 
         html += `<div class="${cellClass}">`;
         html += `<div class="month-day-number ${holiday ? 'holiday-date' : ''}">${day}</div>`;
@@ -431,6 +452,32 @@ function isPastDate(date) {
     const compareDate = new Date(date);
     compareDate.setHours(0, 0, 0, 0);
     return compareDate < today;
+}
+
+// Check if a date is today
+function isToday(date) {
+    const today = new Date();
+    const compareDate = new Date(date);
+    return today.getFullYear() === compareDate.getFullYear() &&
+           today.getMonth() === compareDate.getMonth() &&
+           today.getDate() === compareDate.getDate();
+}
+
+// Update current date and time display
+function updateCurrentDateTime() {
+    const now = new Date();
+
+    // Format date: "Wednesday, January 15, 2026"
+    const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const dateStr = now.toLocaleDateString('en-US', dateOptions);
+
+    // Format time: "14:30"
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = `${hours}:${minutes}`;
+
+    document.getElementById('currentDateLabel').textContent = dateStr;
+    document.getElementById('currentTimeLabel').textContent = timeStr;
 }
 
 // Day Booking Functions

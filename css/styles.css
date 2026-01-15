@@ -218,6 +218,32 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Current Date/Time Display */
+.current-datetime {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+}
+
+.current-date-label {
+    font-size: 1rem;
+}
+
+.current-time-label {
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+}
+
 .timetable-controls {
     display: flex;
     justify-content: center;
@@ -619,6 +645,46 @@ form {
 
 .month-day-cell.past-day .month-booking-item:hover {
     transform: none;
+}
+
+/* Current Day (Today) Highlighting */
+.month-day-cell.today {
+    border: 2px solid #667eea;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.month-day-cell.today .month-day-number {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+/* Today in weekly view - header */
+.timetable th.today-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+}
+
+.timetable th.today-header .header-date {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Today in weekly view - column */
+.timetable td.today-cell {
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+    border-left: 2px solid #667eea;
+    border-right: 2px solid #667eea;
+}
+
+.timetable td.today-cell:hover {
+    background: linear-gradient(135deg, #e0e8ff 0%, #d8e0ff 100%);
 }
 
 .month-day-number {
