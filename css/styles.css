@@ -85,19 +85,19 @@ body {
 }
 
 .btn-view {
-    background-color: #e0e7ff;
-    color: #3730a3;
-    border: 1px solid #c7d2fe;
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
 }
 
 .btn-view:hover {
-    background-color: #c7d2fe;
+    background-color: #dbeafe;
 }
 
 .btn-view.active {
-    background-color: #4f46e5;
+    background-color: #2563eb;
     color: white;
-    border-color: #4f46e5;
+    border-color: #2563eb;
 }
 
 /* Main Content */
@@ -529,7 +529,7 @@ body {
 }
 
 .session-type-workshop {
-    background: #8b5cf6;
+    background: #0ea5e9;
 }
 
 .session-type-meeting {
