@@ -7,11 +7,13 @@
 const state = {
     trainees: [],
     sessions: [],
+    dayBookings: [], // New: day bookings for monthly view
     currentWeekStart: getWeekStart(new Date()),
     currentMonth: new Date(),
     currentView: 'week', // 'week' or 'month'
     editingTraineeId: null,
-    editingSessionId: null
+    editingSessionId: null,
+    editingBookingId: null
 };
 
 // Time slots for the timetable (8 AM to 6 PM)
@@ -112,8 +114,12 @@ function getHoliday(date) {
 // Storage Keys
 const STORAGE_KEYS = {
     TRAINEES: 'trainee_timetable_trainees',
-    SESSIONS: 'trainee_timetable_sessions'
+    SESSIONS: 'trainee_timetable_sessions',
+    DAY_BOOKINGS: 'trainee_timetable_day_bookings'
 };
+
+// Constants
+const MAX_WEEKLY_HOURS = 20;
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', init);
@@ -159,6 +165,7 @@ function switchView(view) {
 function loadData() {
     const storedTrainees = localStorage.getItem(STORAGE_KEYS.TRAINEES);
     const storedSessions = localStorage.getItem(STORAGE_KEYS.SESSIONS);
+    const storedBookings = localStorage.getItem(STORAGE_KEYS.DAY_BOOKINGS);
 
     if (storedTrainees) {
         state.trainees = JSON.parse(storedTrainees);
@@ -167,11 +174,16 @@ function loadData() {
     if (storedSessions) {
         state.sessions = JSON.parse(storedSessions);
     }
+
+    if (storedBookings) {
+        state.dayBookings = JSON.parse(storedBookings);
+    }
 }
 
 function saveData() {
     localStorage.setItem(STORAGE_KEYS.TRAINEES, JSON.stringify(state.trainees));
     localStorage.setItem(STORAGE_KEYS.SESSIONS, JSON.stringify(state.sessions));
+    localStorage.setItem(STORAGE_KEYS.DAY_BOOKINGS, JSON.stringify(state.dayBookings));
 }
 
 // Date Utilities
@@ -334,7 +346,7 @@ function renderMonthView() {
 
     // Days of month
     for (let day = 1; day <= totalDays; day++) {
-        const date = new Date(year, month, day);
+        const date = new Date(year, month, day, 12, 0, 0); // Use noon to avoid timezone edge cases
         const dayOfWeek = (date.getDay() + 6) % 7;
         const isWeekend = dayOfWeek >= 5;
         const holiday = getHoliday(date);
@@ -354,12 +366,27 @@ function renderMonthView() {
             html += `</div>`;
         }
 
-        // Show sessions count for this day (weekdays only, non-holidays)
+        // Show bookings for this day (weekdays only, non-holidays)
         if (!isWeekend && !holiday) {
-            const daySessions = getSessionsForDay(date);
-            if (daySessions.length > 0) {
-                html += `<div class="month-sessions-count">${daySessions.length} session${daySessions.length > 1 ? 's' : ''}</div>`;
+            const dateKey = getDateKey(date);
+            const dayBookings = getBookingsForDay(date);
+
+            if (dayBookings.length > 0) {
+                html += `<div class="month-bookings">`;
+                dayBookings.forEach(booking => {
+                    const trainee = state.trainees.find(t => t.id === booking.traineeId);
+                    const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
+                    html += `<div class="month-booking-item ${statusClass}" onclick="openBookingModal('${dateKey}', '${booking.id}')">`;
+                    html += `<span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>`;
+                    html += `<span class="booking-hours">${booking.hours}h</span>`;
+                    html += `<span class="booking-status">${booking.status}</span>`;
+                    html += `</div>`;
+                });
+                html += `</div>`;
             }
+
+            // Add booking button
+            html += `<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`;
         }
 
         html += '</div>';
@@ -386,6 +413,56 @@ function getSessionsForDay(date) {
         s.week === weekKey &&
         s.day === dayOfWeek
     );
+}
+
+// Day Booking Functions
+function getDateKey(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getBookingsForDay(date) {
+    const dateKey = getDateKey(date);
+    return state.dayBookings.filter(b => b.date === dateKey);
+}
+
+function getWeeklyHoursForTrainee(traineeId, weekStartDate) {
+    const weekStart = getWeekStart(weekStartDate);
+    let totalHours = 0;
+
+    // Check all 7 days of the week
+    for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(weekStart);
+        dayDate.setDate(dayDate.getDate() + i);
+        const dateKey = getDateKey(dayDate);
+
+        const dayBookings = state.dayBookings.filter(b =>
+            b.date === dateKey && b.traineeId === traineeId
+        );
+
+        dayBookings.forEach(b => {
+            totalHours += b.hours || 0;
+        });
+    }
+
+    return totalHours;
+}
+
+function canAddHours(traineeId, date, newHours, excludeBookingId = null) {
+    const weekStart = getWeekStart(date);
+    let currentWeeklyHours = getWeeklyHoursForTrainee(traineeId, weekStart);
+
+    // If editing, subtract the old hours
+    if (excludeBookingId) {
+        const existingBooking = state.dayBookings.find(b => b.id === excludeBookingId);
+        if (existingBooking) {
+            currentWeeklyHours -= existingBooking.hours || 0;
+        }
+    }
+
+    return (currentWeeklyHours + newHours) <= MAX_WEEKLY_HOURS;
 }
 
 function formatTimeDisplay(time) {
@@ -495,6 +572,11 @@ function bindEvents() {
     document.getElementById('traineeForm').addEventListener('submit', handleTraineeSubmit);
     document.getElementById('sessionForm').addEventListener('submit', handleSessionSubmit);
     document.getElementById('deleteSessionBtn').addEventListener('click', deleteSession);
+
+    // Booking form
+    document.getElementById('bookingForm').addEventListener('submit', handleBookingSubmit);
+    document.getElementById('deleteBookingBtn').addEventListener('click', deleteBooking);
+    document.getElementById('bookingTrainee').addEventListener('change', updateWeeklyHoursInfo);
 
     // Close modal on backdrop click
     document.querySelectorAll('.modal').forEach(modal => {
@@ -762,7 +844,129 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+// Day Booking Management
+function openBookingModal(dateKey, bookingId = null) {
+    state.editingBookingId = bookingId;
+
+    // Populate trainee select
+    const select = document.getElementById('bookingTrainee');
+    select.innerHTML = '<option value="">Select a trainee</option>' +
+        state.trainees.map(t => `<option value="${t.id}">${escapeHtml(t.name)}</option>`).join('');
+
+    const existingBooking = bookingId ? state.dayBookings.find(b => b.id === bookingId) : null;
+
+    document.getElementById('bookingModalTitle').textContent = existingBooking ? 'Edit Training Day' : 'Add Training Day';
+    document.getElementById('bookingTrainee').value = existingBooking ? existingBooking.traineeId : '';
+    document.getElementById('bookingHours').value = existingBooking ? existingBooking.hours : 8;
+    document.getElementById('bookingStatus').value = existingBooking ? existingBooking.status : 'planned';
+    document.getElementById('bookingDate').value = dateKey;
+    document.getElementById('bookingId').value = bookingId || '';
+
+    const deleteBtn = document.getElementById('deleteBookingBtn');
+    if (existingBooking) {
+        deleteBtn.classList.remove('hidden');
+    } else {
+        deleteBtn.classList.add('hidden');
+    }
+
+    updateWeeklyHoursInfo();
+    showModal('bookingModal');
+}
+
+function updateWeeklyHoursInfo() {
+    const traineeId = document.getElementById('bookingTrainee').value;
+    const dateKey = document.getElementById('bookingDate').value;
+    const infoDiv = document.getElementById('weeklyHoursInfo');
+
+    if (!traineeId || !dateKey) {
+        infoDiv.textContent = '';
+        return;
+    }
+
+    // Parse date from dateKey
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    const weeklyHours = getWeeklyHoursForTrainee(traineeId, date);
+    const remaining = MAX_WEEKLY_HOURS - weeklyHours;
+
+    // If editing, add back the current booking's hours
+    const bookingId = document.getElementById('bookingId').value;
+    if (bookingId) {
+        const existingBooking = state.dayBookings.find(b => b.id === bookingId);
+        if (existingBooking && existingBooking.traineeId === traineeId) {
+            infoDiv.textContent = `Weekly: ${weeklyHours}h used, ${remaining + existingBooking.hours}h available (including current)`;
+            return;
+        }
+    }
+
+    infoDiv.textContent = `Weekly: ${weeklyHours}h used, ${remaining}h available (max ${MAX_WEEKLY_HOURS}h/week)`;
+    infoDiv.style.color = remaining <= 0 ? '#e74c3c' : '#666';
+}
+
+function handleBookingSubmit(e) {
+    e.preventDefault();
+
+    const traineeId = document.getElementById('bookingTrainee').value;
+    const hours = parseInt(document.getElementById('bookingHours').value);
+    const status = document.getElementById('bookingStatus').value;
+    const dateKey = document.getElementById('bookingDate').value;
+    const bookingId = document.getElementById('bookingId').value;
+
+    if (!traineeId || !hours || !dateKey) return;
+
+    // Parse date for weekly hours check
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+
+    // Check weekly hours limit
+    if (!canAddHours(traineeId, date, hours, bookingId || null)) {
+        alert(`Cannot add ${hours} hours. Would exceed weekly limit of ${MAX_WEEKLY_HOURS} hours for this trainee.`);
+        return;
+    }
+
+    if (bookingId) {
+        // Update existing booking
+        const booking = state.dayBookings.find(b => b.id === bookingId);
+        if (booking) {
+            booking.traineeId = traineeId;
+            booking.hours = hours;
+            booking.status = status;
+        }
+    } else {
+        // Create new booking
+        const newBooking = {
+            id: generateId(),
+            date: dateKey,
+            traineeId,
+            hours,
+            status
+        };
+        state.dayBookings.push(newBooking);
+    }
+
+    saveData();
+    renderCurrentView();
+    closeModal('bookingModal');
+}
+
+function deleteBooking() {
+    const bookingId = document.getElementById('bookingId').value;
+    if (!bookingId) return;
+
+    if (!confirm('Are you sure you want to delete this training day?')) {
+        return;
+    }
+
+    state.dayBookings = state.dayBookings.filter(b => b.id !== bookingId);
+
+    saveData();
+    renderCurrentView();
+    closeModal('bookingModal');
+}
+
 // Make functions available globally for inline event handlers
 window.editTrainee = editTrainee;
 window.deleteTrainee = deleteTrainee;
 window.switchView = switchView;
+window.openBookingModal = openBookingModal;

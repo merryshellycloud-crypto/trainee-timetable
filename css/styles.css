@@ -648,6 +648,80 @@ form {
     margin-top: 0.25rem;
 }
 
+/* Day Booking Styles */
+.month-bookings {
+    margin-top: 0.25rem;
+}
+
+.month-booking-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding: 0.3rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.month-booking-item:hover {
+    transform: scale(1.02);
+}
+
+.month-booking-item.status-planned {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    color: white;
+}
+
+.month-booking-item.status-present {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: white;
+}
+
+.booking-trainee {
+    font-weight: 600;
+    flex: 1;
+    min-width: 60%;
+}
+
+.booking-hours {
+    font-weight: 500;
+    background: rgba(255,255,255,0.2);
+    padding: 0.1rem 0.25rem;
+    border-radius: 3px;
+}
+
+.booking-status {
+    text-transform: uppercase;
+    font-size: 0.55rem;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.add-booking-btn {
+    font-size: 0.65rem;
+    color: #4a90d9;
+    cursor: pointer;
+    padding: 0.2rem;
+    text-align: center;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+    margin-top: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.add-booking-btn:hover {
+    background: #e8f4fd;
+    border-color: #4a90d9;
+}
+
+.form-hint {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 0.25rem;
+}
+
 /* Utility Classes */
 .hidden {
     display: none !important;

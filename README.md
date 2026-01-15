@@ -8,6 +8,8 @@ A simple web application for managing trainee schedules and timetables.
 - **Week/Month Views**: Toggle between weekly timetable and monthly calendar
 - **Timetable View**: Weekly timetable grid with time slots (Monday - Sunday)
 - **Monthly View**: Full month calendar with holiday details and session counts
+- **Day Booking**: Book training days for trainees with status tracking (planned/present)
+- **Training Hours**: Track daily hours (max 8/day) with weekly limit of 20 hours per trainee
 - **Weekend Display**: Saturday and Sunday visible in grey, non-editable
 - **Bulgarian Holidays 2026**: Public holidays with detailed descriptions (1-2 sentences)
 - **Session Scheduling**: Schedule training sessions for trainees
@@ -47,6 +49,16 @@ trainee-timetable/
 Works in all modern browsers (Chrome, Firefox, Safari, Edge).
 
 ## Changelog
+
+### v1.4.0
+- **Feature**: Added Day Booking functionality in Monthly View
+- Book training days for trainees by clicking on calendar days
+- Status tracking: "Planned" (orange) and "Present" (green) states
+- Training hours input (1-8 hours per day)
+- Weekly hours limit of 20 hours per trainee with real-time validation
+- Visual display of bookings with trainee name, hours, and status
+- Edit and delete existing bookings
+- **Bugfix**: Fixed timezone bug affecting New Year's Day display
 
 ### v1.3.0
 - **Feature**: Added Monthly View with full calendar display

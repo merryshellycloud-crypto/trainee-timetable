@@ -138,6 +138,43 @@
         </div>
     </div>
 
+    <!-- Day Booking Modal -->
+    <div id="bookingModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="bookingModalTitle">Add Training Day</h3>
+                <button class="modal-close" data-modal="bookingModal">&times;</button>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label for="bookingTrainee">Trainee</label>
+                    <select id="bookingTrainee" required>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="bookingHours">Training Hours (max 8 per day)</label>
+                    <input type="number" id="bookingHours" min="1" max="8" value="8" required>
+                    <div id="weeklyHoursInfo" class="form-hint"></div>
+                </div>
+                <div class="form-group">
+                    <label for="bookingStatus">Status</label>
+                    <select id="bookingStatus" required>
+                        <option value="planned">Planned</option>
+                        <option value="present">Present</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="deleteBookingBtn" class="btn btn-danger hidden">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-modal="bookingModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                <input type="hidden" id="bookingId">
+                <input type="hidden" id="bookingDate">
+            </form>
+        </div>
+    </div>
+
     <script src="js/app.js"></script>
 </body>
 </html>
