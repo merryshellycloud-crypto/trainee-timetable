@@ -103,6 +103,7 @@ document.addEventListener('DOMContentLoaded', init);
 function init() {
     cacheDOMElements();
     loadData();
+    autoUpdatePastBookings(); // Auto-set past planned bookings to present
     buildLookupMaps();
     renderCurrentView();
     renderTraineeList();
@@ -110,6 +111,23 @@ function init() {
     updateCurrentDateTime();
     bindEvents();
     setInterval(updateCurrentDateTime, 60000);
+}
+
+// Auto-update past bookings from 'planned' to 'present'
+function autoUpdatePastBookings() {
+    const today = getTodayInfo();
+    let updated = false;
+
+    state.dayBookings.forEach(booking => {
+        if (booking.status === 'planned' && booking.date < today.key) {
+            booking.status = 'present';
+            updated = true;
+        }
+    });
+
+    if (updated) {
+        saveData();
+    }
 }
 
 // Build lookup maps for O(1) access
@@ -451,19 +469,54 @@ function renderTraineeList() {
         return;
     }
 
-    DOM.traineeList.innerHTML = state.trainees.map(t => `
+    // Get current week for hours calculation
+    const currentWeekStart = state.currentView === 'week' ? state.currentWeekStart : getWeekStart(new Date());
+
+    DOM.traineeList.innerHTML = state.trainees.map(t => {
+        const weeklyStats = getTraineeWeeklyStats(t.id, currentWeekStart);
+        return `
         <div class="trainee-item" data-id="${t.id}">
             <div class="trainee-color" style="background-color: ${t.color}"></div>
             <div class="trainee-info">
                 <div class="trainee-name">${escapeHtml(t.name)}</div>
                 ${t.email ? `<div class="trainee-email">${escapeHtml(t.email)}</div>` : ''}
+                <div class="trainee-hours">
+                    <span class="hours-total" title="Total weekly hours">${weeklyStats.total}h / ${MAX_WEEKLY_HOURS}h</span>
+                    <span class="hours-detail">(${weeklyStats.present}h present, ${weeklyStats.planned}h planned)</span>
+                </div>
             </div>
             <div class="trainee-actions">
                 <button onclick="editTrainee('${t.id}')" title="Edit">&#9998;</button>
                 <button onclick="deleteTrainee('${t.id}')" title="Delete">&#10005;</button>
             </div>
         </div>
-    `).join('');
+    `}).join('');
+}
+
+// Get weekly stats for a trainee (planned and present hours)
+function getTraineeWeeklyStats(traineeId, weekStartDate) {
+    const weekStart = getWeekStart(weekStartDate);
+    let planned = 0;
+    let present = 0;
+
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(weekStart);
+        d.setDate(d.getDate() + i);
+        const dateKey = getDateKey(d);
+        const dayBookings = state.bookingsByDate.get(dateKey) || [];
+
+        dayBookings.forEach(b => {
+            if (b.traineeId === traineeId) {
+                if (b.status === 'present') {
+                    present += b.hours || 0;
+                } else {
+                    planned += b.hours || 0;
+                }
+            }
+        });
+    }
+
+    return { planned, present, total: planned + present };
 }
 
 function updatePeriodDisplay() {
@@ -519,6 +572,7 @@ function navigate(direction) {
     }
     updatePeriodDisplay();
     renderCurrentView();
+    renderTraineeList(); // Update weekly hours for new period
 }
 
 // Trainee Management
@@ -695,17 +749,39 @@ function openBookingModal(dateKey, bookingId = null) {
     updateTraineeSelect(DOM.bookingTrainee);
 
     const existingBooking = bookingId ? state.dayBookings.find(b => b.id === bookingId) : null;
+    const today = getTodayInfo();
+    const isFutureDate = dateKey > today.key;
 
     DOM.bookingModalTitle.textContent = existingBooking ? 'Edit Training Day' : 'Add Training Day';
     DOM.bookingTrainee.value = existingBooking ? existingBooking.traineeId : '';
     DOM.bookingHours.value = existingBooking ? existingBooking.hours : 8;
-    DOM.bookingStatus.value = existingBooking ? existingBooking.status : 'planned';
     DOM.bookingDate.value = dateKey;
     DOM.bookingId.value = bookingId || '';
+
+    // Update status options based on date
+    // Future dates: only "planned" allowed
+    // Today/past dates: both options allowed
+    updateStatusOptions(isFutureDate, existingBooking ? existingBooking.status : 'planned');
 
     DOM.deleteBookingBtn.classList.toggle('hidden', !existingBooking);
     updateWeeklyHoursInfo();
     showModal('bookingModal');
+}
+
+// Update status select options based on date
+function updateStatusOptions(isFutureDate, currentStatus) {
+    if (isFutureDate) {
+        // Future dates: only planned allowed
+        DOM.bookingStatus.innerHTML = '<option value="planned">Planned</option>';
+        DOM.bookingStatus.value = 'planned';
+    } else {
+        // Today or past: both options allowed
+        DOM.bookingStatus.innerHTML = `
+            <option value="planned">Planned</option>
+            <option value="present">Present</option>
+        `;
+        DOM.bookingStatus.value = currentStatus;
+    }
 }
 
 function updateWeeklyHoursInfo() {
@@ -739,7 +815,7 @@ function handleBookingSubmit(e) {
     e.preventDefault();
     const traineeId = DOM.bookingTrainee.value;
     const hours = parseInt(DOM.bookingHours.value);
-    const status = DOM.bookingStatus.value;
+    let status = DOM.bookingStatus.value;
     const dateKey = DOM.bookingDate.value;
     const bookingId = DOM.bookingId.value;
 
@@ -747,6 +823,12 @@ function handleBookingSubmit(e) {
 
     const [year, month, day] = dateKey.split('-').map(Number);
     const date = new Date(year, month - 1, day);
+    const today = getTodayInfo();
+
+    // Enforce status restriction: future dates can only be "planned"
+    if (dateKey > today.key && status === 'present') {
+        status = 'planned';
+    }
 
     if (!canAddHours(traineeId, date, hours, bookingId || null)) {
         alert(`Cannot add ${hours} hours. Would exceed weekly limit of ${MAX_WEEKLY_HOURS} hours for this trainee.`);
@@ -766,6 +848,7 @@ function handleBookingSubmit(e) {
 
     saveData();
     renderCurrentView();
+    renderTraineeList(); // Update weekly hours display
     closeModal('bookingModal');
 }
 
@@ -776,6 +859,7 @@ function deleteBooking() {
     state.dayBookings = state.dayBookings.filter(b => b.id !== bookingId);
     saveData();
     renderCurrentView();
+    renderTraineeList(); // Update weekly hours display
     closeModal('bookingModal');
 }
 

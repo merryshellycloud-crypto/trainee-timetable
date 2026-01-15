@@ -53,6 +53,17 @@ Works in all modern browsers (Chrome, Firefox, Safari, Edge).
 
 ## Changelog
 
+### v1.8.0
+- **Feature**: Status restrictions based on date
+- Future dates: Only "Planned" status allowed (cannot mark as present)
+- Today/past dates: Both "Planned" and "Present" allowed
+- **Feature**: Auto-update past bookings
+- Bookings with "Planned" status automatically change to "Present" when date passes
+- **Feature**: Weekly hours display in trainee panel
+- Shows total hours used per week (e.g., "16h / 20h")
+- Breakdown of present vs planned hours
+- Updates when navigating between weeks
+
 ### v1.7.0
 - **Performance**: Major optimization for faster responsiveness
 - DOM elements cached at initialization (no repeated queries)

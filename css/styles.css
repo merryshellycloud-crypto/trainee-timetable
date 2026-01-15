@@ -172,6 +172,25 @@ body {
     text-overflow: ellipsis;
 }
 
+.trainee-hours {
+    font-size: 0.7rem;
+    margin-top: 0.25rem;
+    padding: 0.2rem 0.4rem;
+    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
+    border-radius: 4px;
+    border: 1px solid #d0d8f0;
+}
+
+.hours-total {
+    font-weight: 600;
+    color: #4a90d9;
+}
+
+.hours-detail {
+    color: #666;
+    margin-left: 0.25rem;
+}
+
 .trainee-actions {
     display: flex;
     gap: 0.25rem;
