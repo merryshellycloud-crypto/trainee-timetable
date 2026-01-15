@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trainee Timetable</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Trainee Timetable</h1>
+            <div class="header-actions">
+                <button id="addTraineeBtn" class="btn btn-primary">Add Trainee</button>
+                <button id="exportBtn" class="btn btn-secondary">Export Data</button>
+                <button id="importBtn" class="btn btn-secondary">Import Data</button>
+                <input type="file" id="importFile" accept=".json" hidden>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <aside class="trainee-panel">
+                <h2>Trainees</h2>
+                <div id="traineeList" class="trainee-list">
+                    <!-- Trainees will be rendered here -->
+                </div>
+            </aside>
+
+            <section class="timetable-section">
+                <div class="timetable-controls">
+                    <button id="prevWeekBtn" class="btn btn-small">&larr; Previous Week</button>
+                    <span id="currentWeek" class="current-week"></span>
+                    <button id="nextWeekBtn" class="btn btn-small">Next Week &rarr;</button>
+                </div>
+                <div class="timetable-container">
+                    <table class="timetable" id="timetable">
+                        <thead>
+                            <tr>
+                                <th class="time-column">Time</th>
+                                <th>Monday</th>
+                                <th>Tuesday</th>
+                                <th>Wednesday</th>
+                                <th>Thursday</th>
+                                <th>Friday</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timetableBody">
+                            <!-- Timetable rows will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add/Edit Trainee Modal -->
+    <div id="traineeModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="traineeModalTitle">Add Trainee</h3>
+                <button class="modal-close" data-modal="traineeModal">&times;</button>
+            </div>
+            <form id="traineeForm">
+                <div class="form-group">
+                    <label for="traineeName">Name</label>
+                    <input type="text" id="traineeName" required>
+                </div>
+                <div class="form-group">
+                    <label for="traineeEmail">Email</label>
+                    <input type="email" id="traineeEmail">
+                </div>
+                <div class="form-group">
+                    <label for="traineeColor">Color</label>
+                    <input type="color" id="traineeColor" value="#4a90d9">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" data-modal="traineeModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                <input type="hidden" id="traineeId">
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Session Modal -->
+    <div id="sessionModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="sessionModalTitle">Add Session</h3>
+                <button class="modal-close" data-modal="sessionModal">&times;</button>
+            </div>
+            <form id="sessionForm">
+                <div class="form-group">
+                    <label for="sessionTrainee">Trainee</label>
+                    <select id="sessionTrainee" required>
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sessionTitle">Session Title</label>
+                    <input type="text" id="sessionTitle" required>
+                </div>
+                <div class="form-group">
+                    <label for="sessionType">Session Type</label>
+                    <select id="sessionType">
+                        <option value="training">Training</option>
+                        <option value="workshop">Workshop</option>
+                        <option value="meeting">Meeting</option>
+                        <option value="assessment">Assessment</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="sessionNotes">Notes</label>
+                    <textarea id="sessionNotes" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="deleteSessionBtn" class="btn btn-danger hidden">Delete</button>
+                    <button type="button" class="btn btn-secondary" data-modal="sessionModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+                <input type="hidden" id="sessionId">
+                <input type="hidden" id="sessionDay">
+                <input type="hidden" id="sessionTime">
+                <input type="hidden" id="sessionWeek">
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

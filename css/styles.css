@@ -1,0 +1,481 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+/* App Container */
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.app-header {
+    background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+    color: white;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.app-header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #27ae60;
+}
+
+.btn-secondary {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.btn-small {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+}
+
+/* Main Content */
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Trainee Panel */
+.trainee-panel {
+    width: 250px;
+    background: white;
+    border-right: 1px solid #e1e5eb;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.trainee-panel h2 {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.trainee-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.trainee-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.trainee-item:hover {
+    background: #e9ecef;
+}
+
+.trainee-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.trainee-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.trainee-name {
+    font-weight: 500;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trainee-email {
+    font-size: 0.75rem;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.trainee-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.trainee-item:hover .trainee-actions {
+    opacity: 1;
+}
+
+.trainee-actions button {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    cursor: pointer;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+.trainee-actions button:hover {
+    color: #333;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: #888;
+    font-size: 0.875rem;
+}
+
+/* Timetable Section */
+.timetable-section {
+    flex: 1;
+    padding: 1rem;
+    overflow: auto;
+}
+
+.timetable-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.current-week {
+    font-weight: 600;
+    color: #4a90d9;
+    min-width: 200px;
+    text-align: center;
+}
+
+.timetable-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+/* Timetable */
+.timetable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.timetable th,
+.timetable td {
+    border: 1px solid #e1e5eb;
+    padding: 0.5rem;
+    text-align: center;
+    vertical-align: top;
+}
+
+.timetable th {
+    background: #f8f9fa;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #555;
+    padding: 0.75rem 0.5rem;
+}
+
+.timetable .time-column {
+    width: 80px;
+    font-size: 0.8125rem;
+    color: #666;
+}
+
+.timetable td {
+    height: 60px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.timetable td:hover {
+    background-color: #f0f7ff;
+}
+
+.timetable td.time-cell {
+    background: #f8f9fa;
+    cursor: default;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #666;
+}
+
+.timetable td.time-cell:hover {
+    background: #f8f9fa;
+}
+
+/* Session Items */
+.session-item {
+    padding: 0.375rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    color: white;
+    margin-bottom: 0.25rem;
+    cursor: pointer;
+    text-align: left;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.session-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.session-item:last-child {
+    margin-bottom: 0;
+}
+
+.session-title {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-trainee {
+    font-size: 0.6875rem;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Session Type Colors */
+.session-type-training {
+    background: linear-gradient(135deg, #4a90d9 0%, #357abd 100%);
+}
+
+.session-type-workshop {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+.session-type-meeting {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.session-type-assessment {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+.session-type-other {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+/* Modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    animation: modalSlideIn 0.2s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e1e5eb;
+}
+
+.modal-header h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #999;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+/* Forms */
+form {
+    padding: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #555;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4a90d9;
+    box-shadow: 0 0 0 3px rgba(74, 144, 217, 0.1);
+}
+
+.form-group input[type="color"] {
+    padding: 0.25rem;
+    height: 40px;
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.form-actions .btn-danger {
+    margin-right: auto;
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
+    .header-actions {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .main-content {
+        flex-direction: column;
+    }
+
+    .trainee-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #e1e5eb;
+        max-height: 200px;
+    }
+
+    .timetable-container {
+        overflow-x: auto;
+    }
+
+    .timetable {
+        min-width: 600px;
+    }
+}
