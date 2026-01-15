@@ -23,6 +23,30 @@ const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
 // Weekend days (non-editable)
 const WEEKEND_DAYS = [5, 6]; // Saturday = 5, Sunday = 6
 
+// Bulgarian Public Holidays 2026
+const HOLIDAYS_2026 = {
+    '2026-01-01': { name: 'New Year', short: 'NY' },
+    '2026-03-03': { name: 'Liberation Day', short: 'LD' },
+    '2026-04-17': { name: 'Good Friday', short: 'GF' },
+    '2026-04-18': { name: 'Holy Saturday', short: 'HS' },
+    '2026-04-19': { name: 'Easter Sunday', short: 'ES' },
+    '2026-04-20': { name: 'Easter Monday', short: 'EM' },
+    '2026-05-01': { name: 'Labour Day', short: 'LabD' },
+    '2026-05-06': { name: "St. George's Day", short: 'SGD' },
+    '2026-05-24': { name: 'Education Day', short: 'ED' },
+    '2026-09-06': { name: 'Unification Day', short: 'UD' },
+    '2026-09-22': { name: 'Independence Day', short: 'ID' },
+    '2026-12-24': { name: 'Christmas Eve', short: 'CE' },
+    '2026-12-25': { name: 'Christmas Day', short: 'XM' },
+    '2026-12-26': { name: 'Christmas Day 2', short: 'XM2' }
+};
+
+// Function to check if a date is a holiday
+function getHoliday(date) {
+    const dateStr = date.toISOString().split('T')[0];
+    return HOLIDAYS_2026[dateStr] || null;
+}
+
 // Storage Keys
 const STORAGE_KEYS = {
     TRAINEES: 'trainee_timetable_trainees',
@@ -88,7 +112,10 @@ function renderTimetable() {
     const tbody = document.getElementById('timetableBody');
     tbody.innerHTML = '';
 
-    TIME_SLOTS.forEach(time => {
+    // Update header with dates
+    updateTableHeader();
+
+    TIME_SLOTS.forEach((time, timeIndex) => {
         const row = document.createElement('tr');
 
         // Time cell
@@ -105,13 +132,31 @@ function renderTimetable() {
 
             const isWeekend = WEEKEND_DAYS.includes(dayIndex);
 
+            // Calculate actual date for this day
+            const cellDate = new Date(state.currentWeekStart);
+            cellDate.setDate(cellDate.getDate() + dayIndex);
+            const holiday = getHoliday(cellDate);
+
             // Add weekend class for styling
             if (isWeekend) {
                 cell.classList.add('weekend-cell');
             }
 
-            // Get sessions for this cell (only for weekdays)
-            if (!isWeekend) {
+            // Add holiday class and annotation
+            if (holiday) {
+                cell.classList.add('holiday-cell');
+                // Only show holiday info in first time slot
+                if (timeIndex === 0) {
+                    const holidayLabel = document.createElement('div');
+                    holidayLabel.className = 'holiday-label';
+                    holidayLabel.innerHTML = `<span class="holiday-short">${holiday.short}</span>`;
+                    holidayLabel.title = holiday.name;
+                    cell.appendChild(holidayLabel);
+                }
+            }
+
+            // Get sessions for this cell (only for weekdays and non-holidays)
+            if (!isWeekend && !holiday) {
                 const cellSessions = getSessionsForCell(dayIndex, time);
                 cellSessions.forEach(session => {
                     const sessionEl = createSessionElement(session);
@@ -130,6 +175,33 @@ function renderTimetable() {
         });
 
         tbody.appendChild(row);
+    });
+}
+
+// Update table header with dates
+function updateTableHeader() {
+    const headerRow = document.querySelector('.timetable thead tr');
+    const headers = headerRow.querySelectorAll('th:not(.time-column)');
+
+    headers.forEach((th, index) => {
+        const cellDate = new Date(state.currentWeekStart);
+        cellDate.setDate(cellDate.getDate() + index);
+        const dayNum = cellDate.getDate();
+        const holiday = getHoliday(cellDate);
+
+        // Clear existing content but keep classes
+        const dayName = DAYS[index];
+        const isWeekend = WEEKEND_DAYS.includes(index);
+
+        if (holiday) {
+            th.innerHTML = `${dayName}<br><span class="header-date holiday-date">${dayNum}</span>`;
+            th.classList.add('holiday-header');
+        } else if (isWeekend) {
+            th.innerHTML = `${dayName}<br><span class="header-date">${dayNum}</span>`;
+        } else {
+            th.innerHTML = `${dayName}<br><span class="header-date">${dayNum}</span>`;
+            th.classList.remove('holiday-header');
+        }
     });
 }
 
