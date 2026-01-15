@@ -44,6 +44,7 @@ TIME_SLOTS.forEach(time => {
 });
 
 // Bulgarian Public Holidays 2026
+// Note: When a holiday falls on Saturday/Sunday, the following Monday is a compensation day (Bulgarian law)
 const HOLIDAYS_2026 = {
     '2026-01-01': { name: 'New Year\'s Day', short: 'NY', description: 'Celebrates the beginning of the new calendar year. Bulgarians welcome the new year with festive gatherings, fireworks, and traditional meals.' },
     '2026-03-03': { name: 'Liberation Day', short: 'LD', description: 'Bulgaria\'s National Day commemorating liberation from Ottoman rule in 1878. The Treaty of San Stefano ended nearly 500 years of Ottoman domination.' },
@@ -54,11 +55,14 @@ const HOLIDAYS_2026 = {
     '2026-05-01': { name: 'Labour Day', short: 'LabD', description: 'International Workers\' Day celebrating the achievements of workers worldwide. Many Bulgarians enjoy outdoor activities and picnics.' },
     '2026-05-06': { name: 'St. George\'s Day', short: 'SGD', description: 'Also known as Bulgarian Army Day. Honors St. George, patron saint of the military. Traditional lamb dishes are prepared on this day.' },
     '2026-05-24': { name: 'Education & Culture Day', short: 'ED', description: 'Celebrates Saints Cyril and Methodius who created the Cyrillic alphabet. A day honoring Bulgarian education, culture, and Slavic heritage.' },
+    '2026-05-25': { name: 'Education Day (Observed)', short: 'ED+', description: 'Compensation day for Education & Culture Day which falls on Sunday. Per Bulgarian law, the following Monday is a non-working day.' },
     '2026-09-06': { name: 'Unification Day', short: 'UD', description: 'Commemorates the unification of Eastern Rumelia with the Principality of Bulgaria in 1885. A milestone in Bulgarian national unity.' },
+    '2026-09-07': { name: 'Unification Day (Observed)', short: 'UD+', description: 'Compensation day for Unification Day which falls on Sunday. Per Bulgarian law, the following Monday is a non-working day.' },
     '2026-09-22': { name: 'Independence Day', short: 'ID', description: 'Marks Bulgaria\'s declaration of full independence from the Ottoman Empire in 1908. Celebrated with official ceremonies and cultural events.' },
     '2026-12-24': { name: 'Christmas Eve', short: 'CE', description: 'Badni Vecher - a sacred family evening with traditional meatless dinner of odd-numbered dishes. Families gather to share blessings.' },
     '2026-12-25': { name: 'Christmas Day', short: 'XM', description: 'Celebrates the birth of Jesus Christ. Bulgarian Christmas traditions include caroling, festive meals, and family gatherings.' },
-    '2026-12-26': { name: 'Christmas Day 2', short: 'XM2', description: 'Second day of Christmas celebrations. Continued family visits, festive meals, and holiday traditions across Bulgaria.' }
+    '2026-12-26': { name: 'Christmas Day 2', short: 'XM2', description: 'Second day of Christmas celebrations. Continued family visits, festive meals, and holiday traditions across Bulgaria.' },
+    '2026-12-28': { name: 'Christmas (Observed)', short: 'XM+', description: 'Compensation day for Christmas Day 2 which falls on Saturday. Per Bulgarian law, the following Monday is a non-working day.' }
 };
 
 // Storage Keys
