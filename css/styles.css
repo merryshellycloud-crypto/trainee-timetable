@@ -599,6 +599,28 @@ form {
     border-color: #ffcccc;
 }
 
+.month-day-cell.past-day {
+    background: #e8e8e8;
+    cursor: not-allowed;
+}
+
+.month-day-cell.past-day:hover {
+    background: #e8e8e8;
+}
+
+.month-day-cell.past-day .month-day-number {
+    color: #999;
+}
+
+.month-day-cell.past-day .month-booking-item {
+    cursor: default;
+    opacity: 0.8;
+}
+
+.month-day-cell.past-day .month-booking-item:hover {
+    transform: none;
+}
+
 .month-day-number {
     font-size: 1rem;
     font-weight: 600;

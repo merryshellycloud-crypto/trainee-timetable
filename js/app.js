@@ -350,10 +350,12 @@ function renderMonthView() {
         const dayOfWeek = (date.getDay() + 6) % 7;
         const isWeekend = dayOfWeek >= 5;
         const holiday = getHoliday(date);
+        const isPast = isPastDate(date);
 
         let cellClass = 'month-day-cell';
         if (isWeekend) cellClass += ' weekend';
         if (holiday) cellClass += ' holiday';
+        if (isPast) cellClass += ' past-day';
 
         html += `<div class="${cellClass}">`;
         html += `<div class="month-day-number ${holiday ? 'holiday-date' : ''}">${day}</div>`;
@@ -376,7 +378,12 @@ function renderMonthView() {
                 dayBookings.forEach(booking => {
                     const trainee = state.trainees.find(t => t.id === booking.traineeId);
                     const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
-                    html += `<div class="month-booking-item ${statusClass}" onclick="openBookingModal('${dateKey}', '${booking.id}')">`;
+                    // Past days: show bookings but no click handler
+                    if (isPast) {
+                        html += `<div class="month-booking-item ${statusClass}">`;
+                    } else {
+                        html += `<div class="month-booking-item ${statusClass}" onclick="openBookingModal('${dateKey}', '${booking.id}')">`;
+                    }
                     html += `<span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>`;
                     html += `<span class="booking-hours">${booking.hours}h</span>`;
                     html += `<span class="booking-status">${booking.status}</span>`;
@@ -385,8 +392,10 @@ function renderMonthView() {
                 html += `</div>`;
             }
 
-            // Add booking button
-            html += `<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`;
+            // Add booking button only for future/current dates
+            if (!isPast) {
+                html += `<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`;
+            }
         }
 
         html += '</div>';
@@ -413,6 +422,15 @@ function getSessionsForDay(date) {
         s.week === weekKey &&
         s.day === dayOfWeek
     );
+}
+
+// Check if a date is in the past (before today)
+function isPastDate(date) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    return compareDate < today;
 }
 
 // Day Booking Functions
