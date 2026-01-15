@@ -432,14 +432,10 @@ function renderMonthView() {
                 if (isTodayDate) cellClass += ' today';
 
                 parts.push(`<div class="${cellClass}">`);
-                parts.push(`<div class="month-day-number${holiday ? ' holiday-date' : ''}">${currentDay}</div>`);
+                parts.push(`<div class="month-day-header${holiday ? ' holiday-date' : ''}">${currentDay}${holiday ? ` <span class="month-holiday-title">${holiday.name}</span>` : ''}</div>`);
 
                 if (holiday) {
-                    parts.push(`<div class="month-holiday-info">
-                        <span class="month-holiday-badge">${holiday.short}</span>
-                        <div class="month-holiday-name">${holiday.name}</div>
-                        <div class="month-holiday-desc">${holiday.description}</div>
-                    </div>`);
+                    parts.push(`<div class="month-holiday-desc">${holiday.description}</div>`);
                 } else if (!isWeekend) {
                     // Get bookings using map lookup
                     const dayBookings = state.bookingsByDate.get(dateKey) || [];
