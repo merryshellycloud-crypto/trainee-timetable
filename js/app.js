@@ -99,12 +99,13 @@ const HOLIDAYS_2026 = {
     }
 };
 
-// View mode: 'week' or 'month'
-let currentView = 'week';
-
 // Function to check if a date is a holiday
 function getHoliday(date) {
-    const dateStr = date.toISOString().split('T')[0];
+    // Use local date to avoid timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
     return HOLIDAYS_2026[dateStr] || null;
 }
 
@@ -194,7 +195,11 @@ function formatWeekRange(weekStart) {
 }
 
 function getWeekKey(date) {
-    return date.toISOString().split('T')[0];
+    // Use local date to avoid timezone issues
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // Rendering Functions
@@ -760,3 +765,4 @@ function escapeHtml(text) {
 // Make functions available globally for inline event handlers
 window.editTrainee = editTrainee;
 window.deleteTrainee = deleteTrainee;
+window.switchView = switchView;
