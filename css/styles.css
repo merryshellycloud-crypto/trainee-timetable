@@ -172,23 +172,58 @@ body {
     text-overflow: ellipsis;
 }
 
-.trainee-hours {
-    font-size: 0.7rem;
-    margin-top: 0.25rem;
-    padding: 0.2rem 0.4rem;
-    background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%);
-    border-radius: 4px;
-    border: 1px solid #d0d8f0;
-}
-
-.hours-total {
-    font-weight: 600;
-    color: #4a90d9;
-}
-
-.hours-detail {
+.trainee-week-label {
+    font-size: 0.6rem;
+    font-weight: 700;
     color: #666;
-    margin-left: 0.25rem;
+    margin-top: 0.4rem;
+    background: #e9ecef;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.trainee-hours-bars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.35rem;
+    align-items: center;
+}
+
+.hours-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: white;
+}
+
+.hours-bar .bar-icon {
+    font-size: 0.55rem;
+}
+
+.present-bar {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    box-shadow: 0 1px 3px rgba(39, 174, 96, 0.3);
+}
+
+.planned-bar {
+    background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+    box-shadow: 0 1px 3px rgba(230, 126, 34, 0.3);
+}
+
+.hours-total-badge {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: #555;
+    background: #f5f5f5;
+    padding: 0.2rem 0.4rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
 }
 
 .trainee-actions {

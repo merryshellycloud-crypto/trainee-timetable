@@ -471,6 +471,7 @@ function renderTraineeList() {
 
     // Get current week for hours calculation
     const currentWeekStart = state.currentView === 'week' ? state.currentWeekStart : getWeekStart(new Date());
+    const weekNumber = getWeekNumber(currentWeekStart);
 
     DOM.traineeList.innerHTML = state.trainees.map(t => {
         const weeklyStats = getTraineeWeeklyStats(t.id, currentWeekStart);
@@ -480,9 +481,17 @@ function renderTraineeList() {
             <div class="trainee-info">
                 <div class="trainee-name">${escapeHtml(t.name)}</div>
                 ${t.email ? `<div class="trainee-email">${escapeHtml(t.email)}</div>` : ''}
-                <div class="trainee-hours">
-                    <span class="hours-total" title="Total weekly hours">${weeklyStats.total}h / ${MAX_WEEKLY_HOURS}h</span>
-                    <span class="hours-detail">(${weeklyStats.present}h present, ${weeklyStats.planned}h planned)</span>
+                <div class="trainee-week-label">W${weekNumber}</div>
+                <div class="trainee-hours-bars">
+                    <div class="hours-bar present-bar" title="Present hours">
+                        <span class="bar-icon">&#10003;</span>
+                        <span class="bar-value">${weeklyStats.present}h</span>
+                    </div>
+                    <div class="hours-bar planned-bar" title="Planned hours">
+                        <span class="bar-icon">&#9679;</span>
+                        <span class="bar-value">${weeklyStats.planned}h</span>
+                    </div>
+                    <div class="hours-total-badge">${weeklyStats.total}/${MAX_WEEKLY_HOURS}h</div>
                 </div>
             </div>
             <div class="trainee-actions">
@@ -491,6 +500,15 @@ function renderTraineeList() {
             </div>
         </div>
     `}).join('');
+}
+
+// Get ISO week number
+function getWeekNumber(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 }
 
 // Get weekly stats for a trainee (planned and present hours)
