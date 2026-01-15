@@ -53,6 +53,16 @@ Works in all modern browsers (Chrome, Firefox, Safari, Edge).
 
 ## Changelog
 
+### v1.7.0
+- **Performance**: Major optimization for faster responsiveness
+- DOM elements cached at initialization (no repeated queries)
+- Lookup maps (Map) for O(1) trainee, booking, and session access
+- Pre-computed time display cache
+- Optimized escapeHtml without DOM creation
+- DocumentFragment for batch DOM operations
+- String array joining for monthly view HTML generation
+- Reduced object creation in loops
+
 ### v1.6.0
 - **Feature**: Current day highlighting in both week and month views
 - Today's date visually highlighted with purple border and gradient background
