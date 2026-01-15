@@ -27,19 +27,27 @@
             </aside>
 
             <section class="timetable-section">
-                <div class="view-toggle">
-                    <button type="button" id="weekViewBtn" class="btn btn-view active" onclick="switchView('week')">Week View</button>
-                    <button type="button" id="monthViewBtn" class="btn btn-view" onclick="switchView('month')">Month View</button>
+                <div class="calendar-header">
+                    <div class="calendar-header-row">
+                        <div class="timetable-controls">
+                            <button id="prevBtn" class="btn btn-nav">&larr;</button>
+                            <span id="currentPeriod" class="current-period"></span>
+                            <button id="nextBtn" class="btn btn-nav">&rarr;</button>
+                        </div>
+                        <div class="header-right">
+                            <div class="current-datetime">
+                                <span class="current-date-label" id="currentDateLabel"></span>
+                                <span class="current-time-label" id="currentTimeLabel"></span>
+                            </div>
+                            <div class="view-toggle">
+                                <button type="button" id="weekViewBtn" class="btn btn-view active" onclick="switchView('week')">Week View</button>
+                                <button type="button" id="monthViewBtn" class="btn btn-view" onclick="switchView('month')">Month View</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="current-datetime">
-                    <span class="current-date-label" id="currentDateLabel"></span>
-                    <span class="current-time-label" id="currentTimeLabel"></span>
-                </div>
-                <div class="timetable-controls">
-                    <button id="prevBtn" class="btn btn-small">&larr; <span id="prevLabel">Previous Week</span></button>
-                    <span id="currentPeriod" class="current-week"></span>
-                    <button id="nextBtn" class="btn btn-small"><span id="nextLabel">Next Week</span> &rarr;</button>
-                </div>
+                <span id="prevLabel" class="hidden">Previous Week</span>
+                <span id="nextLabel" class="hidden">Next Week</span>
                 <div class="timetable-container" id="weekView">
                     <table class="timetable" id="timetable">
                         <thead>
