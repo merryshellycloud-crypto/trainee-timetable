@@ -352,71 +352,96 @@ function renderMonthView() {
     // Build HTML string
     const parts = ['<div class="month-header-row">'];
 
+    // Week number header
+    parts.push('<div class="month-header-cell week-header">Wk</div>');
+
     DAY_NAMES_SHORT.forEach((day, i) => {
         parts.push(`<div class="month-header-cell${i >= 5 ? ' weekend' : ''}">${day}</div>`);
     });
     parts.push('</div><div class="month-days-grid">');
 
-    // Empty cells before first day
-    for (let i = 0; i < startDayOfWeek; i++) {
-        parts.push('<div class="month-day-cell empty"></div>');
-    }
+    // Build calendar row by row
+    let currentDay = 1;
+    let currentDayOfWeek = startDayOfWeek;
 
-    // Days of month
-    for (let day = 1; day <= totalDays; day++) {
-        const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayOfWeek = (startDayOfWeek + day - 1) % 7;
-        const isWeekend = dayOfWeek >= 5;
-        const holiday = getHoliday(dateKey);
-        const isPast = isPastDate(dateKey, today);
-        const isTodayDate = isToday(dateKey, today);
+    // Calculate number of rows needed
+    const totalCells = startDayOfWeek + totalDays;
+    const numRows = Math.ceil(totalCells / 7);
 
-        let cellClass = 'month-day-cell';
-        if (isWeekend) cellClass += ' weekend';
-        if (holiday) cellClass += ' holiday';
-        if (isPast) cellClass += ' past-day';
-        if (isTodayDate) cellClass += ' today';
-
-        parts.push(`<div class="${cellClass}">`);
-        parts.push(`<div class="month-day-number${holiday ? ' holiday-date' : ''}">${day}</div>`);
-
-        if (holiday) {
-            parts.push(`<div class="month-holiday-info">
-                <span class="month-holiday-badge">${holiday.short}</span>
-                <div class="month-holiday-name">${holiday.name}</div>
-                <div class="month-holiday-desc">${holiday.description}</div>
-            </div>`);
-        } else if (!isWeekend) {
-            // Get bookings using map lookup
-            const dayBookings = state.bookingsByDate.get(dateKey) || [];
-
-            if (dayBookings.length > 0) {
-                parts.push('<div class="month-bookings">');
-                dayBookings.forEach(booking => {
-                    const trainee = state.traineeMap.get(booking.traineeId);
-                    const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
-                    const clickAttr = isPast ? '' : ` onclick="openBookingModal('${dateKey}', '${booking.id}')"`;
-                    parts.push(`<div class="month-booking-item ${statusClass}"${clickAttr}>
-                        <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
-                        <span class="booking-hours">${booking.hours}h</span>
-                        <span class="booking-status">${booking.status}</span>
-                    </div>`);
-                });
-                parts.push('</div>');
-            }
-
-            if (!isPast) {
-                parts.push(`<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`);
-            }
+    for (let row = 0; row < numRows; row++) {
+        // Calculate week number for first day of this row
+        let weekNum;
+        if (row === 0 && startDayOfWeek > 0) {
+            // First row starts with empty cells, use week of day 1
+            weekNum = getWeekNumber(new Date(year, month, 1));
+        } else {
+            const dayInRow = currentDay <= totalDays ? currentDay : totalDays;
+            weekNum = getWeekNumber(new Date(year, month, dayInRow));
         }
 
-        parts.push('</div>');
-    }
+        // Add week number cell
+        parts.push(`<div class="month-week-cell">W${weekNum}</div>`);
 
-    // Empty cells after last day
-    const endDayOfWeek = (startDayOfWeek + totalDays - 1) % 7;
-    for (let i = endDayOfWeek + 1; i < 7; i++) {
-        parts.push('<div class="month-day-cell empty"></div>');
+        // Add 7 day cells for this row
+        for (let col = 0; col < 7; col++) {
+            if (row === 0 && col < startDayOfWeek) {
+                // Empty cells before first day
+                parts.push('<div class="month-day-cell empty"></div>');
+            } else if (currentDay > totalDays) {
+                // Empty cells after last day
+                parts.push('<div class="month-day-cell empty"></div>');
+            } else {
+                // Actual day cell
+                const dateKey = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDay).padStart(2, '0')}`;
+                const dayOfWeek = col;
+                const isWeekend = dayOfWeek >= 5;
+                const holiday = getHoliday(dateKey);
+                const isPast = isPastDate(dateKey, today);
+                const isTodayDate = isToday(dateKey, today);
+
+                let cellClass = 'month-day-cell';
+                if (isWeekend) cellClass += ' weekend';
+                if (holiday) cellClass += ' holiday';
+                if (isPast) cellClass += ' past-day';
+                if (isTodayDate) cellClass += ' today';
+
+                parts.push(`<div class="${cellClass}">`);
+                parts.push(`<div class="month-day-number${holiday ? ' holiday-date' : ''}">${currentDay}</div>`);
+
+                if (holiday) {
+                    parts.push(`<div class="month-holiday-info">
+                        <span class="month-holiday-badge">${holiday.short}</span>
+                        <div class="month-holiday-name">${holiday.name}</div>
+                        <div class="month-holiday-desc">${holiday.description}</div>
+                    </div>`);
+                } else if (!isWeekend) {
+                    // Get bookings using map lookup
+                    const dayBookings = state.bookingsByDate.get(dateKey) || [];
+
+                    if (dayBookings.length > 0) {
+                        parts.push('<div class="month-bookings">');
+                        dayBookings.forEach(booking => {
+                            const trainee = state.traineeMap.get(booking.traineeId);
+                            const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
+                            const clickAttr = isPast ? '' : ` onclick="openBookingModal('${dateKey}', '${booking.id}')"`;
+                            parts.push(`<div class="month-booking-item ${statusClass}"${clickAttr}>
+                                <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
+                                <span class="booking-hours">${booking.hours}h</span>
+                                <span class="booking-status">${booking.status}</span>
+                            </div>`);
+                        });
+                        parts.push('</div>');
+                    }
+
+                    if (!isPast) {
+                        parts.push(`<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`);
+                    }
+                }
+
+                parts.push('</div>');
+                currentDay++;
+            }
+        }
     }
 
     parts.push('</div>');

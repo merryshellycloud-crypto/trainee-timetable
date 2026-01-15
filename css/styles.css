@@ -626,7 +626,7 @@ form {
 
 .month-header-row {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: 50px repeat(7, 1fr);
     gap: 0.25rem;
     margin-bottom: 0.5rem;
 }
@@ -641,6 +641,12 @@ form {
     border-radius: 6px;
 }
 
+.month-header-cell.week-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 0.75rem;
+}
+
 .month-header-cell.weekend {
     background: #e9ecef;
     color: #888;
@@ -648,8 +654,20 @@ form {
 
 .month-days-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: 50px repeat(7, 1fr);
     gap: 0.25rem;
+}
+
+.month-week-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 700;
+    font-size: 0.75rem;
+    border-radius: 6px;
+    min-height: 100px;
 }
 
 .month-day-cell {
