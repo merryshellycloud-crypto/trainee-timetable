@@ -18,7 +18,10 @@ const TIME_SLOTS = [
     '13:00', '14:00', '15:00', '16:00', '17:00'
 ];
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+// Weekend days (non-editable)
+const WEEKEND_DAYS = [5, 6]; // Saturday = 5, Sunday = 6
 
 // Storage Keys
 const STORAGE_KEYS = {
@@ -72,7 +75,7 @@ function formatDate(date) {
 
 function formatWeekRange(weekStart) {
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekEnd.getDate() + 4);
+    weekEnd.setDate(weekEnd.getDate() + 6); // Monday to Sunday
     return `${formatDate(weekStart)} - ${formatDate(weekEnd)}, ${weekStart.getFullYear()}`;
 }
 
@@ -100,18 +103,28 @@ function renderTimetable() {
             cell.dataset.day = dayIndex;
             cell.dataset.time = time;
 
-            // Get sessions for this cell
-            const cellSessions = getSessionsForCell(dayIndex, time);
-            cellSessions.forEach(session => {
-                const sessionEl = createSessionElement(session);
-                cell.appendChild(sessionEl);
-            });
+            const isWeekend = WEEKEND_DAYS.includes(dayIndex);
 
-            cell.addEventListener('click', (e) => {
-                if (e.target === cell) {
-                    openSessionModal(dayIndex, time);
-                }
-            });
+            // Add weekend class for styling
+            if (isWeekend) {
+                cell.classList.add('weekend-cell');
+            }
+
+            // Get sessions for this cell (only for weekdays)
+            if (!isWeekend) {
+                const cellSessions = getSessionsForCell(dayIndex, time);
+                cellSessions.forEach(session => {
+                    const sessionEl = createSessionElement(session);
+                    cell.appendChild(sessionEl);
+                });
+
+                // Only add click event for weekdays (editable)
+                cell.addEventListener('click', (e) => {
+                    if (e.target === cell) {
+                        openSessionModal(dayIndex, time);
+                    }
+                });
+            }
 
             row.appendChild(cell);
         });
