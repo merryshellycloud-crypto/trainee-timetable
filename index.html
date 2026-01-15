@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trainee Timetable</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/styles.css?v=99">
 </head>
 <body>
     <div class="app-container">
@@ -30,9 +31,13 @@
                 <div class="calendar-header">
                     <div class="calendar-header-row">
                         <div class="timetable-controls">
-                            <button id="prevBtn" class="btn btn-nav">&larr;</button>
+                            <button id="prevBtn" class="btn btn-nav" aria-label="Previous">
+                                <i class="fa-solid fa-angle-left"></i>
+                            </button>
                             <span id="currentPeriod" class="current-period"></span>
-                            <button id="nextBtn" class="btn btn-nav">&rarr;</button>
+                            <button id="nextBtn" class="btn btn-nav" aria-label="Next">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </button>
                         </div>
                         <div class="header-right">
                             <div class="current-datetime">
