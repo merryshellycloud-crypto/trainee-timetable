@@ -133,8 +133,8 @@ body {
 
 .trainee-item {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.25rem;
     padding: 0.5rem 0.75rem;
     background: #f8fafc;
     border-radius: 6px;
@@ -148,6 +148,12 @@ body {
     border-color: #bfdbfe;
 }
 
+.trainee-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
 .trainee-color {
     width: 8px;
     height: 8px;
@@ -155,32 +161,41 @@ body {
     flex-shrink: 0;
 }
 
-.trainee-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.trainee-row {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    flex-wrap: wrap;
-}
-
 .trainee-name {
     font-weight: 600;
     font-size: 0.8rem;
     color: #1e293b;
+    flex: 1;
+}
+
+.trainee-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-left: 1rem;
+}
+
+.trainee-week-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.trainee-week-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
 }
 
 .trainee-week-label {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     font-weight: 600;
     color: #3b82f6;
     background: #eff6ff;
-    padding: 0.15rem 0.4rem;
+    padding: 0.1rem 0.3rem;
     border-radius: 3px;
-    display: inline-block;
+    min-width: 22px;
+    text-align: center;
 }
 
 .trainee-hours-bars {
@@ -221,8 +236,8 @@ body {
 
 .trainee-actions {
     display: flex;
-    gap: 0.25rem;
-    opacity: 0;
+    gap: 0.15rem;
+    opacity: 0.3;
     transition: opacity 0.15s ease;
 }
 
@@ -233,10 +248,10 @@ body {
 .trainee-actions button {
     background: none;
     border: none;
-    padding: 0.25rem;
+    padding: 0.15rem;
     cursor: pointer;
-    color: #64748b;
-    font-size: 0.875rem;
+    color: #94a3b8;
+    font-size: 0.7rem;
 }
 
 .trainee-actions button:hover {

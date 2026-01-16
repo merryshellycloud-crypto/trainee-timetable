@@ -519,30 +519,64 @@ function renderTraineeList() {
         return;
     }
 
-    // Get current week for hours calculation
-    const currentWeekStart = state.currentView === 'week' ? state.currentWeekStart : getWeekStart(new Date());
-    const weekNumber = getWeekNumber(currentWeekStart);
-
     DOM.traineeList.innerHTML = state.trainees.map(t => {
-        const weeklyStats = getTraineeWeeklyStats(t.id, currentWeekStart);
-        return `
-        <div class="trainee-item" data-id="${t.id}">
-            <div class="trainee-color" style="background-color: ${t.color}"></div>
-            <div class="trainee-info">
-                <div class="trainee-row">
-                    <span class="trainee-name">${escapeHtml(t.name)}</span>
-                    <span class="trainee-week-label">W${weekNumber}</span>
-                    <span class="hours-bar present-bar" title="Present">&#10003;${weeklyStats.present}h</span>
-                    <span class="hours-bar planned-bar" title="Planned">&#9679;${weeklyStats.planned}h</span>
-                    <span class="hours-total-badge">${weeklyStats.total}/${MAX_WEEKLY_HOURS}h</span>
+        // Get all weeks with bookings for this trainee
+        const weeksWithBookings = getTraineeWeeksWithBookings(t.id);
+
+        const weeksList = weeksWithBookings.map(w => `
+            <div class="trainee-week-row">
+                <span class="trainee-week-label">W${w.weekNum}</span>
+                <div class="trainee-week-stats">
+                    <span class="hours-bar present-bar" title="Present">&#10003;${w.present}h</span>
+                    <span class="hours-bar planned-bar" title="Planned">&#9679;${w.planned}h</span>
+                    <span class="hours-total-badge">${w.total}/${MAX_WEEKLY_HOURS}h</span>
                 </div>
             </div>
-            <div class="trainee-actions">
-                <button onclick="editTrainee('${t.id}')" title="Edit">&#9998;</button>
-                <button onclick="deleteTrainee('${t.id}')" title="Delete">&#10005;</button>
+        `).join('');
+
+        return `
+        <div class="trainee-item" data-id="${t.id}">
+            <div class="trainee-header">
+                <div class="trainee-color" style="background-color: ${t.color}"></div>
+                <span class="trainee-name">${escapeHtml(t.name)}</span>
+                <div class="trainee-actions">
+                    <button onclick="editTrainee('${t.id}')" title="Edit">&#9998;</button>
+                    <button onclick="deleteTrainee('${t.id}')" title="Delete">&#10005;</button>
+                </div>
             </div>
+            ${weeksList ? `<div class="trainee-weeks">${weeksList}</div>` : ''}
         </div>
     `}).join('');
+}
+
+// Get all weeks with bookings for a trainee
+function getTraineeWeeksWithBookings(traineeId) {
+    const weeksMap = new Map();
+
+    state.dayBookings.forEach(booking => {
+        if (booking.traineeId === traineeId) {
+            const bookingDate = new Date(booking.date);
+            const weekStart = getWeekStart(bookingDate);
+            const weekKey = getDateKey(weekStart);
+            const weekNum = getWeekNumber(bookingDate);
+
+            if (!weeksMap.has(weekKey)) {
+                weeksMap.set(weekKey, { weekNum, weekStart, planned: 0, present: 0 });
+            }
+
+            const week = weeksMap.get(weekKey);
+            if (booking.status === 'present') {
+                week.present += booking.hours || 0;
+            } else {
+                week.planned += booking.hours || 0;
+            }
+        }
+    });
+
+    // Convert to array and sort by week number
+    return Array.from(weeksMap.values())
+        .map(w => ({ ...w, total: w.planned + w.present }))
+        .sort((a, b) => a.weekNum - b.weekNum);
 }
 
 // Get ISO week number
