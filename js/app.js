@@ -306,7 +306,6 @@ function renderTimetable() {
                 cell.classList.add('holiday-cell');
                 if (timeIndex === 0) {
                     cell.innerHTML = `<div class="holiday-label">
-                        <span class="holiday-short">${info.holiday.short}</span>
                         <div class="holiday-name">${info.holiday.name}</div>
                         <div class="holiday-desc">${info.holiday.description}</div>
                     </div>`;
@@ -432,12 +431,10 @@ function renderMonthView() {
                 if (isTodayDate) cellClass += ' today';
 
                 parts.push(`<div class="${cellClass}">`);
-                parts.push(`<div class="month-day-number${holiday ? ' holiday-date' : ''}">${currentDay}</div>`);
+                parts.push(`<div class="month-day-header${holiday ? ' holiday-date' : ''}"><span class="month-day-number">${currentDay}</span>${holiday ? `<span class="month-holiday-name">${holiday.name}</span>` : ''}</div>`);
 
                 if (holiday) {
                     parts.push(`<div class="month-holiday-info">
-                        <span class="month-holiday-badge">${holiday.short}</span>
-                        <div class="month-holiday-name">${holiday.name}</div>
                         <div class="month-holiday-desc">${holiday.description}</div>
                     </div>`);
                 } else if (!isWeekend) {

@@ -449,17 +449,6 @@ body {
     padding: 0.25rem;
 }
 
-.holiday-short {
-    display: inline-block;
-    background: #dc2626;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    margin-bottom: 0.25rem;
-}
-
 .holiday-name {
     font-size: 0.7rem;
     font-weight: 600;
@@ -808,33 +797,31 @@ form {
     font-size: 0.9rem;
     font-weight: 600;
     color: #1e293b;
+}
+
+.month-day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
     margin-bottom: 0.25rem;
 }
 
-.month-day-number.holiday-date {
+.month-day-header.holiday-date {
+    color: #dc2626;
+}
+
+.month-day-header.holiday-date .month-day-number {
     color: #dc2626;
 }
 
 .month-holiday-info {
-    margin-top: 0.25rem;
-}
-
-.month-holiday-badge {
-    display: inline-block;
-    background: #dc2626;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    margin-bottom: 0.25rem;
+    margin-top: 0.15rem;
 }
 
 .month-holiday-name {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: #dc2626;
-    margin-bottom: 0.15rem;
 }
 
 .month-holiday-desc {
