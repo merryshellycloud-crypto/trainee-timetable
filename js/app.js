@@ -526,9 +526,11 @@ function renderTraineeList() {
         const weeksList = weeksWithBookings.map(w => `
             <div class="trainee-week-row">
                 <span class="trainee-week-label">W${w.weekNum}</span>
-                <span class="hours-bar present-bar" title="Present">&#10003;${w.present}h</span>
-                <span class="hours-bar planned-bar" title="Planned">&#9679;${w.planned}h</span>
-                <span class="hours-total-badge">${w.total}/${MAX_WEEKLY_HOURS}h</span>
+                <div class="trainee-week-stats">
+                    <span class="hours-bar present-bar" title="Present">&#10003;${w.present}h</span>
+                    <span class="hours-bar planned-bar" title="Planned">&#9679;${w.planned}h</span>
+                    <span class="hours-total-badge">${w.total}/${MAX_WEEKLY_HOURS}h</span>
+                </div>
             </div>
         `).join('');
 
