@@ -278,7 +278,12 @@ function renderTimetable() {
         let headerClass = '';
         if (info.holiday) headerClass = 'holiday-date';
 
-        th.innerHTML = `${DAYS[index]}<br><span class="header-date ${headerClass}">${info.dayNum}</span>`;
+        let headerContent = `${DAYS[index]}<br><span class="header-date ${headerClass}">${info.dayNum}`;
+        if (info.holiday) {
+            headerContent += ` <span class="header-holiday-name">${info.holiday.name}</span>`;
+        }
+        headerContent += `</span>`;
+        th.innerHTML = headerContent;
 
         if (info.holiday) th.classList.add('holiday-header');
         if (info.isToday) th.classList.add('today-header');
@@ -306,8 +311,6 @@ function renderTimetable() {
                 cell.classList.add('holiday-cell');
                 if (timeIndex === 0) {
                     cell.innerHTML = `<div class="holiday-label">
-                        <span class="holiday-short">${info.holiday.short}</span>
-                        <div class="holiday-name">${info.holiday.name}</div>
                         <div class="holiday-desc">${info.holiday.description}</div>
                     </div>`;
                 }

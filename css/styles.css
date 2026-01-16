@@ -484,6 +484,12 @@ body {
     font-weight: 600;
 }
 
+.header-holiday-name {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #dc2626;
+}
+
 /* Session Items */
 .session-item {
     padding: 0.375rem 0.5rem;
