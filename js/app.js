@@ -529,19 +529,12 @@ function renderTraineeList() {
         <div class="trainee-item" data-id="${t.id}">
             <div class="trainee-color" style="background-color: ${t.color}"></div>
             <div class="trainee-info">
-                <div class="trainee-name">${escapeHtml(t.name)}</div>
-                ${t.email ? `<div class="trainee-email">${escapeHtml(t.email)}</div>` : ''}
-                <div class="trainee-week-label">W${weekNumber}</div>
-                <div class="trainee-hours-bars">
-                    <div class="hours-bar present-bar" title="Present hours">
-                        <span class="bar-icon">&#10003;</span>
-                        <span class="bar-value">${weeklyStats.present}h</span>
-                    </div>
-                    <div class="hours-bar planned-bar" title="Planned hours">
-                        <span class="bar-icon">&#9679;</span>
-                        <span class="bar-value">${weeklyStats.planned}h</span>
-                    </div>
-                    <div class="hours-total-badge">${weeklyStats.total}/${MAX_WEEKLY_HOURS}h</div>
+                <div class="trainee-row">
+                    <span class="trainee-name">${escapeHtml(t.name)}</span>
+                    <span class="trainee-week-label">W${weekNumber}</span>
+                    <span class="hours-bar present-bar" title="Present">&#10003;${weeklyStats.present}h</span>
+                    <span class="hours-bar planned-bar" title="Planned">&#9679;${weeklyStats.planned}h</span>
+                    <span class="hours-total-badge">${weeklyStats.total}/${MAX_WEEKLY_HOURS}h</span>
                 </div>
             </div>
             <div class="trainee-actions">
