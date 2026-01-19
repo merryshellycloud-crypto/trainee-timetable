@@ -450,10 +450,11 @@ function renderMonthView() {
                             const trainee = state.traineeMap.get(booking.traineeId);
                             const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
                             const clickAttr = isPast ? '' : ` onclick="openBookingModal('${dateKey}', '${booking.id}')"`;
-                            parts.push(`<div class="month-booking-item ${statusClass}"${clickAttr}>
+                            // Color coding: lighter for planned, full color for present
+                            const bgColor = trainee ? (booking.status === 'present' ? trainee.color : adjustColor(trainee.color, 60)) : '#ccc';
+                            parts.push(`<div class="month-booking-item ${statusClass}" style="background-color: ${bgColor};"${clickAttr}>
                                 <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
                                 <span class="booking-hours">${booking.hours}h</span>
-                                <span class="booking-status">${booking.status}</span>
                             </div>`);
                         });
                         parts.push('</div>');
@@ -508,7 +509,10 @@ function canAddHours(traineeId, date, newHours, excludeBookingId = null) {
 
     if (excludeBookingId) {
         const existingBooking = state.dayBookings.find(b => b.id === excludeBookingId);
-        if (existingBooking) currentWeeklyHours -= existingBooking.hours || 0;
+        // Only subtract hours if the existing booking belongs to the same trainee
+        if (existingBooking && existingBooking.traineeId === traineeId) {
+            currentWeeklyHours -= existingBooking.hours || 0;
+        }
     }
 
     return (currentWeeklyHours + newHours) <= MAX_WEEKLY_HOURS;

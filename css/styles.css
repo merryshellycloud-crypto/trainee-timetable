@@ -866,6 +866,8 @@ form {
     margin-bottom: 0.25rem;
     cursor: pointer;
     transition: transform 0.1s ease;
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
 }
 
 .month-booking-item:hover {
@@ -873,15 +875,11 @@ form {
 }
 
 .month-booking-item.status-planned {
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
+    border: 2px dashed rgba(255,255,255,0.5);
 }
 
 .month-booking-item.status-present {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #86efac;
+    border: 2px solid rgba(0,0,0,0.15);
 }
 
 .booking-trainee {
@@ -891,17 +889,10 @@ form {
 }
 
 .booking-hours {
-    font-weight: 500;
-    background: rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.25);
     padding: 0.1rem 0.25rem;
     border-radius: 3px;
-}
-
-.booking-status {
-    text-transform: uppercase;
-    font-size: 0.55rem;
-    font-weight: 600;
-    opacity: 0.8;
 }
 
 .add-booking-btn {
