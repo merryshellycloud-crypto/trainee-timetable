@@ -18,6 +18,7 @@ const state = {
     editingTraineeId: null,
     editingSessionId: null,
     editingBookingId: null,
+    historyUnlocked: false, // Allow editing past bookings when true
     // Cached lookups for performance
     traineeMap: new Map(),
     bookingsByDate: new Map(),
@@ -94,7 +95,7 @@ function cacheDOMElements() {
         'bookingModalTitle', 'bookingTrainee', 'bookingHours', 'bookingStatus',
         'bookingDate', 'bookingId', 'deleteBookingBtn', 'weeklyHoursInfo',
         'addTraineeBtn', 'exportBtn', 'importBtn', 'importFile', 'prevBtn', 'nextBtn',
-        'traineeForm', 'sessionForm', 'bookingForm'
+        'traineeForm', 'sessionForm', 'bookingForm', 'historyLockBtn'
     ];
     ids.forEach(id => { DOM[id] = document.getElementById(id); });
     DOM.timetableHeaders = document.querySelectorAll('.timetable thead tr th:not(.time-column)');
@@ -449,9 +450,13 @@ function renderMonthView() {
                         dayBookings.forEach(booking => {
                             const trainee = state.traineeMap.get(booking.traineeId);
                             const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
-                            const clickAttr = isPast ? '' : ` onclick="openBookingModal('${dateKey}', '${booking.id}')"`;
-                            // Color coding: lighter for planned, full color for present
-                            const bgColor = trainee ? (booking.status === 'present' ? trainee.color : adjustColor(trainee.color, 60)) : '#ccc';
+                            // Allow editing past bookings when history is unlocked
+                            const canEdit = !isPast || state.historyUnlocked;
+                            const clickAttr = canEdit ? ` onclick="openBookingModal('${dateKey}', '${booking.id}')"` : '';
+                            // Color coding: 40% opacity for planned, darker for present
+                            const bgColor = trainee
+                                ? (booking.status === 'present' ? adjustColor(trainee.color, -30) : hexToRgba(trainee.color, 0.4))
+                                : '#ccc';
                             parts.push(`<div class="month-booking-item ${statusClass}" style="background-color: ${bgColor};"${clickAttr}>
                                 <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
                                 <span class="booking-hours">${booking.hours}h</span>
@@ -461,7 +466,8 @@ function renderMonthView() {
                         parts.push('</div>');
                     }
 
-                    if (!isPast) {
+                    // Show add button for future dates, or past dates when unlocked
+                    if (!isPast || state.historyUnlocked) {
                         parts.push(`<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`);
                     }
                 }
@@ -844,6 +850,14 @@ function adjustColor(color, amount) {
     return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
 }
 
+function hexToRgba(color, opacity) {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
 // Day Booking Management
 function openBookingModal(dateKey, bookingId = null) {
     state.editingBookingId = bookingId;
@@ -964,8 +978,27 @@ function deleteBooking() {
     closeModal('bookingModal');
 }
 
+// Toggle history lock for editing past dates
+function toggleHistoryLock() {
+    state.historyUnlocked = !state.historyUnlocked;
+    const icon = DOM.historyLockBtn.querySelector('i');
+    if (state.historyUnlocked) {
+        icon.classList.remove('fa-lock');
+        icon.classList.add('fa-lock-open');
+        DOM.historyLockBtn.classList.add('unlocked');
+        DOM.historyLockBtn.title = 'Lock to prevent editing past dates';
+    } else {
+        icon.classList.remove('fa-lock-open');
+        icon.classList.add('fa-lock');
+        DOM.historyLockBtn.classList.remove('unlocked');
+        DOM.historyLockBtn.title = 'Unlock to edit past dates';
+    }
+    renderCurrentView();
+}
+
 // Global exports for inline handlers
 window.editTrainee = editTrainee;
 window.deleteTrainee = deleteTrainee;
 window.switchView = switchView;
 window.openBookingModal = openBookingModal;
+window.toggleHistoryLock = toggleHistoryLock;
