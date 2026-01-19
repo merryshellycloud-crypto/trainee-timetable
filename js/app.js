@@ -455,6 +455,7 @@ function renderMonthView() {
                             parts.push(`<div class="month-booking-item ${statusClass}" style="background-color: ${bgColor};"${clickAttr}>
                                 <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
                                 <span class="booking-hours">${booking.hours}h</span>
+                                <span class="booking-status">${booking.status}</span>
                             </div>`);
                         });
                         parts.push('</div>');
