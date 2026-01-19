@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trainee Timetable</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=110">
+    <link rel="stylesheet" href="css/styles.css?v=107">
 </head>
 <body>
     <div class="app-container">
@@ -44,12 +44,12 @@
                                 <span class="current-date-label" id="currentDateLabel"></span>
                                 <span class="current-time-label" id="currentTimeLabel"></span>
                             </div>
-                            <button type="button" id="historyLockBtn" class="btn btn-lock" onclick="toggleHistoryLock()" title="Unlock to edit past dates">
+                            <button id="lockBtn" class="btn btn-nav" aria-label="Lock" title="Lock/Unlock">
                                 <i class="fa-solid fa-lock"></i>
                             </button>
                             <div class="view-toggle">
-                                <button type="button" id="weekViewBtn" class="btn btn-view active" onclick="switchView('week')">Week View</button>
-                                <button type="button" id="monthViewBtn" class="btn btn-view" onclick="switchView('month')">Month View</button>
+                                <button type="button" id="weekViewBtn" class="btn btn-view" onclick="switchView('week')">Week View</button>
+                                <button type="button" id="monthViewBtn" class="btn btn-view active" onclick="switchView('month')">Month View</button>
                             </div>
                         </div>
                     </div>
