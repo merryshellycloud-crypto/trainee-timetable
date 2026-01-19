@@ -133,11 +133,11 @@ body {
 
 .trainee-item {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
     background: #f8fafc;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s ease;
     border: 1px solid transparent;
@@ -148,44 +148,54 @@ body {
     border-color: #bfdbfe;
 }
 
+.trainee-header {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
 .trainee-color {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
 }
 
-.trainee-info {
-    flex: 1;
-    min-width: 0;
-}
-
 .trainee-name {
-    font-weight: 500;
-    font-size: 0.875rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-weight: 600;
+    font-size: 0.8rem;
     color: #1e293b;
+    flex: 1;
 }
 
-.trainee-email {
-    font-size: 0.75rem;
-    color: #64748b;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+.trainee-weeks {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    margin-left: 1rem;
+}
+
+.trainee-week-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.trainee-week-stats {
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
 }
 
 .trainee-week-label {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     font-weight: 600;
     color: #3b82f6;
-    margin-top: 0.4rem;
     background: #eff6ff;
-    padding: 0.15rem 0.4rem;
+    padding: 0.1rem 0.3rem;
     border-radius: 3px;
-    display: inline-block;
+    min-width: 22px;
+    text-align: center;
 }
 
 .trainee-hours-bars {
@@ -199,15 +209,10 @@ body {
 .hours-bar {
     display: inline-flex;
     align-items: center;
-    gap: 0.2rem;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    font-size: 0.65rem;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.6rem;
     font-weight: 500;
-}
-
-.hours-bar .bar-icon {
-    font-size: 0.55rem;
 }
 
 .present-bar {
@@ -221,18 +226,18 @@ body {
 }
 
 .hours-total-badge {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 600;
-    color: #3b82f6;
-    background: #eff6ff;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
+    color: #475569;
+    background: #e2e8f0;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
 }
 
 .trainee-actions {
     display: flex;
-    gap: 0.25rem;
-    opacity: 0;
+    gap: 0.15rem;
+    opacity: 0.3;
     transition: opacity 0.15s ease;
 }
 
@@ -243,10 +248,10 @@ body {
 .trainee-actions button {
     background: none;
     border: none;
-    padding: 0.25rem;
+    padding: 0.15rem;
     cursor: pointer;
-    color: #64748b;
-    font-size: 0.875rem;
+    color: #94a3b8;
+    font-size: 0.7rem;
 }
 
 .trainee-actions button:hover {
@@ -416,17 +421,17 @@ body {
 
 /* Weekend Styles */
 .weekend-header {
-    background: #f1f5f9 !important;
-    color: #94a3b8 !important;
+    background: #dbeafe !important;
+    color: #3b82f6 !important;
 }
 
 .timetable td.weekend-cell {
-    background: #f8fafc;
+    background: #eff6ff;
     cursor: not-allowed;
 }
 
 .timetable td.weekend-cell:hover {
-    background: #f8fafc;
+    background: #eff6ff;
 }
 
 /* Holiday Styles */
@@ -471,6 +476,12 @@ body {
 .header-date.holiday-date {
     color: #dc2626;
     font-weight: 600;
+}
+
+.header-holiday-name {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #dc2626;
 }
 
 /* Session Items */
@@ -682,8 +693,8 @@ form {
 }
 
 .month-header-cell.weekend {
-    background: #f1f5f9;
-    color: #94a3b8;
+    background: #dbeafe;
+    color: #3b82f6;
 }
 
 .month-days-grid {
@@ -723,7 +734,7 @@ form {
 }
 
 .month-day-cell.weekend {
-    background: #f8fafc;
+    background: #eff6ff;
 }
 
 .month-day-cell.holiday {
@@ -793,7 +804,8 @@ form {
     background: #dbeafe;
 }
 
-.month-day-number {
+.month-day-number,
+.month-day-header {
     font-size: 0.9rem;
     font-weight: 600;
     color: #1e293b;
@@ -825,9 +837,10 @@ form {
 }
 
 .month-holiday-desc {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: #64748b;
-    line-height: 1.3;
+    line-height: 1.25;
+    margin-top: 0.15rem;
 }
 
 .month-sessions-count {
@@ -855,6 +868,8 @@ form {
     margin-bottom: 0.25rem;
     cursor: pointer;
     transition: transform 0.1s ease;
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
 }
 
 .month-booking-item:hover {
@@ -862,15 +877,11 @@ form {
 }
 
 .month-booking-item.status-planned {
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
+    border: 2px dashed rgba(255,255,255,0.5);
 }
 
 .month-booking-item.status-present {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #86efac;
+    border: 2px solid rgba(0,0,0,0.15);
 }
 
 .booking-trainee {
@@ -880,17 +891,10 @@ form {
 }
 
 .booking-hours {
-    font-weight: 500;
-    background: rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.25);
     padding: 0.1rem 0.25rem;
     border-radius: 3px;
-}
-
-.booking-status {
-    text-transform: uppercase;
-    font-size: 0.55rem;
-    font-weight: 600;
-    opacity: 0.8;
 }
 
 .add-booking-btn {

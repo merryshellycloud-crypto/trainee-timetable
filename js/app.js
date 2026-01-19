@@ -14,7 +14,7 @@ const state = {
     dayBookings: [],
     currentWeekStart: null,
     currentMonth: new Date(),
-    currentView: 'week',
+    currentView: 'month',
     editingTraineeId: null,
     editingSessionId: null,
     editingBookingId: null,
@@ -47,11 +47,12 @@ TIME_SLOTS.forEach(time => {
 // Note: When a holiday falls on Saturday/Sunday, the following Monday is a compensation day (Bulgarian law)
 const HOLIDAYS_2026 = {
     '2026-01-01': { name: 'New Year\'s Day', short: 'NY', description: 'Celebrates the beginning of the new calendar year. Bulgarians welcome the new year with festive gatherings, fireworks, and traditional meals.' },
+    '2026-01-02': { name: 'Euro Adoption Day', short: 'EUR', description: 'One-time public holiday marking Bulgaria\'s historic adoption of the Euro on January 1, 2026. Bulgaria became the 21st country to join the Eurozone.' },
     '2026-03-03': { name: 'Liberation Day', short: 'LD', description: 'Bulgaria\'s National Day commemorating liberation from Ottoman rule in 1878. The Treaty of San Stefano ended nearly 500 years of Ottoman domination.' },
-    '2026-04-17': { name: 'Good Friday', short: 'GF', description: 'Orthodox Christian holy day marking the crucifixion of Jesus Christ. A solemn day of fasting and reflection before Easter.' },
-    '2026-04-18': { name: 'Holy Saturday', short: 'HS', description: 'The day between Good Friday and Easter Sunday. Bulgarians prepare Easter eggs and traditional kozunak bread.' },
-    '2026-04-19': { name: 'Easter Sunday', short: 'ES', description: 'The most important Orthodox Christian holiday celebrating Christ\'s resurrection. Families gather for festive meals and egg-cracking traditions.' },
-    '2026-04-20': { name: 'Easter Monday', short: 'EM', description: 'Continuation of Easter celebrations. A day for family visits, sharing Easter meals, and enjoying the spring weather.' },
+    '2026-04-10': { name: 'Good Friday', short: 'GF', description: 'Orthodox Christian holy day marking the crucifixion of Jesus Christ. A solemn day of fasting and reflection before Easter.' },
+    '2026-04-11': { name: 'Holy Saturday', short: 'HS', description: 'The day between Good Friday and Easter Sunday. Bulgarians prepare Easter eggs and traditional kozunak bread.' },
+    '2026-04-12': { name: 'Easter Sunday', short: 'ES', description: 'Velikden - the most important Orthodox Christian holiday celebrating Christ\'s resurrection. Families gather for festive lamb meals and egg-cracking traditions.' },
+    '2026-04-13': { name: 'Easter Monday', short: 'EM', description: 'Continuation of Easter celebrations. A day for family visits, sharing Easter meals, and enjoying the spring weather.' },
     '2026-05-01': { name: 'Labour Day', short: 'LabD', description: 'International Workers\' Day celebrating the achievements of workers worldwide. Many Bulgarians enjoy outdoor activities and picnics.' },
     '2026-05-06': { name: 'St. George\'s Day', short: 'SGD', description: 'Also known as Bulgarian Army Day. Honors St. George, patron saint of the military. Traditional lamb dishes are prepared on this day.' },
     '2026-05-24': { name: 'Education & Culture Day', short: 'ED', description: 'Celebrates Saints Cyril and Methodius who created the Cyrillic alphabet. A day honoring Bulgarian education, culture, and Slavic heritage.' },
@@ -278,7 +279,12 @@ function renderTimetable() {
         let headerClass = '';
         if (info.holiday) headerClass = 'holiday-date';
 
-        th.innerHTML = `${DAYS[index]}<br><span class="header-date ${headerClass}">${info.dayNum}</span>`;
+        let headerContent = `${DAYS[index]}<br><span class="header-date ${headerClass}">${info.dayNum}`;
+        if (info.holiday) {
+            headerContent += ` <span class="header-holiday-name">${info.holiday.name}</span>`;
+        }
+        headerContent += `</span>`;
+        th.innerHTML = headerContent;
 
         if (info.holiday) th.classList.add('holiday-header');
         if (info.isToday) th.classList.add('today-header');
@@ -447,10 +453,11 @@ function renderMonthView() {
                             const trainee = state.traineeMap.get(booking.traineeId);
                             const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
                             const clickAttr = isPast ? '' : ` onclick="openBookingModal('${dateKey}', '${booking.id}')"`;
-                            parts.push(`<div class="month-booking-item ${statusClass}"${clickAttr}>
+                            // Color coding: lighter for planned, full color for present
+                            const bgColor = trainee ? (booking.status === 'present' ? trainee.color : adjustColor(trainee.color, 60)) : '#ccc';
+                            parts.push(`<div class="month-booking-item ${statusClass}" style="background-color: ${bgColor};"${clickAttr}>
                                 <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
                                 <span class="booking-hours">${booking.hours}h</span>
-                                <span class="booking-status">${booking.status}</span>
                             </div>`);
                         });
                         parts.push('</div>');
@@ -505,7 +512,10 @@ function canAddHours(traineeId, date, newHours, excludeBookingId = null) {
 
     if (excludeBookingId) {
         const existingBooking = state.dayBookings.find(b => b.id === excludeBookingId);
-        if (existingBooking) currentWeeklyHours -= existingBooking.hours || 0;
+        // Only subtract hours if the existing booking belongs to the same trainee
+        if (existingBooking && existingBooking.traineeId === traineeId) {
+            currentWeeklyHours -= existingBooking.hours || 0;
+        }
     }
 
     return (currentWeeklyHours + newHours) <= MAX_WEEKLY_HOURS;
@@ -517,37 +527,64 @@ function renderTraineeList() {
         return;
     }
 
-    // Get current week for hours calculation
-    const currentWeekStart = state.currentView === 'week' ? state.currentWeekStart : getWeekStart(new Date());
-    const weekNumber = getWeekNumber(currentWeekStart);
-
     DOM.traineeList.innerHTML = state.trainees.map(t => {
-        const weeklyStats = getTraineeWeeklyStats(t.id, currentWeekStart);
-        return `
-        <div class="trainee-item" data-id="${t.id}">
-            <div class="trainee-color" style="background-color: ${t.color}"></div>
-            <div class="trainee-info">
-                <div class="trainee-name">${escapeHtml(t.name)}</div>
-                ${t.email ? `<div class="trainee-email">${escapeHtml(t.email)}</div>` : ''}
-                <div class="trainee-week-label">W${weekNumber}</div>
-                <div class="trainee-hours-bars">
-                    <div class="hours-bar present-bar" title="Present hours">
-                        <span class="bar-icon">&#10003;</span>
-                        <span class="bar-value">${weeklyStats.present}h</span>
-                    </div>
-                    <div class="hours-bar planned-bar" title="Planned hours">
-                        <span class="bar-icon">&#9679;</span>
-                        <span class="bar-value">${weeklyStats.planned}h</span>
-                    </div>
-                    <div class="hours-total-badge">${weeklyStats.total}/${MAX_WEEKLY_HOURS}h</div>
+        // Get all weeks with bookings for this trainee
+        const weeksWithBookings = getTraineeWeeksWithBookings(t.id);
+
+        const weeksList = weeksWithBookings.map(w => `
+            <div class="trainee-week-row">
+                <span class="trainee-week-label">W${w.weekNum}</span>
+                <div class="trainee-week-stats">
+                    <span class="hours-bar present-bar" title="Present">&#10003;${w.present}h</span>
+                    <span class="hours-bar planned-bar" title="Planned">&#9679;${w.planned}h</span>
+                    <span class="hours-total-badge">${w.total}/${MAX_WEEKLY_HOURS}h</span>
                 </div>
             </div>
-            <div class="trainee-actions">
-                <button onclick="editTrainee('${t.id}')" title="Edit">&#9998;</button>
-                <button onclick="deleteTrainee('${t.id}')" title="Delete">&#10005;</button>
+        `).join('');
+
+        return `
+        <div class="trainee-item" data-id="${t.id}">
+            <div class="trainee-header">
+                <div class="trainee-color" style="background-color: ${t.color}"></div>
+                <span class="trainee-name">${escapeHtml(t.name)}</span>
+                <div class="trainee-actions">
+                    <button onclick="editTrainee('${t.id}')" title="Edit">&#9998;</button>
+                    <button onclick="deleteTrainee('${t.id}')" title="Delete">&#10005;</button>
+                </div>
             </div>
+            ${weeksList ? `<div class="trainee-weeks">${weeksList}</div>` : ''}
         </div>
     `}).join('');
+}
+
+// Get all weeks with bookings for a trainee
+function getTraineeWeeksWithBookings(traineeId) {
+    const weeksMap = new Map();
+
+    state.dayBookings.forEach(booking => {
+        if (booking.traineeId === traineeId) {
+            const bookingDate = new Date(booking.date);
+            const weekStart = getWeekStart(bookingDate);
+            const weekKey = getDateKey(weekStart);
+            const weekNum = getWeekNumber(bookingDate);
+
+            if (!weeksMap.has(weekKey)) {
+                weeksMap.set(weekKey, { weekNum, weekStart, planned: 0, present: 0 });
+            }
+
+            const week = weeksMap.get(weekKey);
+            if (booking.status === 'present') {
+                week.present += booking.hours || 0;
+            } else {
+                week.planned += booking.hours || 0;
+            }
+        }
+    });
+
+    // Convert to array and sort by week number
+    return Array.from(weeksMap.values())
+        .map(w => ({ ...w, total: w.planned + w.present }))
+        .sort((a, b) => a.weekNum - b.weekNum);
 }
 
 // Get ISO week number
