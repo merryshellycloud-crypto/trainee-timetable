@@ -258,6 +258,12 @@ body {
     border-radius: 3px;
 }
 
+.hours-total-badge.exceeds-limit {
+    color: #dc2626;
+    background: #fee2e2;
+    font-weight: 700;
+}
+
 .trainee-actions {
     display: flex;
     gap: 0.15rem;

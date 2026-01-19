@@ -535,16 +535,18 @@ function renderTraineeList() {
         // Get all weeks with bookings for this trainee
         const weeksWithBookings = getTraineeWeeksWithBookings(t.id);
 
-        const weeksList = weeksWithBookings.map(w => `
+        const weeksList = weeksWithBookings.map(w => {
+            const exceeds = w.total > MAX_WEEKLY_HOURS;
+            return `
             <div class="trainee-week-row">
                 <span class="trainee-week-label">W${w.weekNum}</span>
                 <div class="trainee-week-stats">
                     <span class="hours-bar present-bar" title="Present">&#10003;${w.present}h</span>
                     <span class="hours-bar planned-bar" title="Planned">&#9679;${w.planned}h</span>
-                    <span class="hours-total-badge">${w.total}/${MAX_WEEKLY_HOURS}h</span>
+                    <span class="hours-total-badge${exceeds ? ' exceeds-limit' : ''}">${w.total}/${MAX_WEEKLY_HOURS}h</span>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
 
         return `
         <div class="trainee-item" data-id="${t.id}">
@@ -945,9 +947,11 @@ function handleBookingSubmit(e) {
         status = 'planned';
     }
 
+    // Warn if exceeding weekly limit, but allow it
     if (!canAddHours(traineeId, date, hours, bookingId || null)) {
-        alert(`Cannot add ${hours} hours. Would exceed weekly limit of ${MAX_WEEKLY_HOURS} hours for this trainee.`);
-        return;
+        if (!confirm(`This will exceed the ${MAX_WEEKLY_HOURS}h weekly limit for this trainee. Continue anyway?`)) {
+            return;
+        }
     }
 
     if (bookingId) {
