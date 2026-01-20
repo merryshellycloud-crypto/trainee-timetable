@@ -18,6 +18,7 @@ const state = {
     editingTraineeId: null,
     editingSessionId: null,
     editingBookingId: null,
+    historyUnlocked: false, // Allow editing past bookings when true
     // Cached lookups for performance
     traineeMap: new Map(),
     bookingsByDate: new Map(),
@@ -27,20 +28,21 @@ const state = {
 // Initialize currentWeekStart after function is defined
 state.currentWeekStart = getWeekStart(new Date());
 
-// Time slots for the timetable (8 AM to 6 PM)
-const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+// Time slots for the timetable (24 hours)
+const TIME_SLOTS = [];
+for (let h = 0; h < 24; h++) {
+    TIME_SLOTS.push(`${String(h).padStart(2, '0')}:00`);
+}
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const DAY_NAMES_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const WEEKEND_DAYS = new Set([5, 6]);
+const WORK_HOURS = { start: 9, end: 18 }; // Focus area with light blue background
 
 // Pre-formatted time display cache
 const TIME_DISPLAY_CACHE = {};
 TIME_SLOTS.forEach(time => {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour;
-    TIME_DISPLAY_CACHE[time] = `${displayHour}:${minutes} ${period}`;
+    const hour = parseInt(time.split(':')[0]);
+    TIME_DISPLAY_CACHE[time] = `${String(hour).padStart(2, '0')}:00`;
 });
 
 // Bulgarian Public Holidays 2026
@@ -90,11 +92,11 @@ function cacheDOMElements() {
         'traineeModal', 'sessionModal', 'bookingModal',
         'traineeModalTitle', 'traineeName', 'traineeEmail', 'traineeColor', 'traineeId',
         'sessionModalTitle', 'sessionTrainee', 'sessionTitle', 'sessionType',
-        'sessionNotes', 'sessionDay', 'sessionTime', 'sessionWeek', 'sessionId', 'deleteSessionBtn',
+        'sessionNotes', 'sessionDay', 'sessionTime', 'sessionEndTime', 'sessionWeek', 'sessionId', 'deleteSessionBtn',
         'bookingModalTitle', 'bookingTrainee', 'bookingHours', 'bookingStatus',
         'bookingDate', 'bookingId', 'deleteBookingBtn', 'weeklyHoursInfo',
         'addTraineeBtn', 'exportBtn', 'importBtn', 'importFile', 'prevBtn', 'nextBtn',
-        'traineeForm', 'sessionForm', 'bookingForm'
+        'traineeForm', 'sessionForm', 'bookingForm', 'historyLockBtn'
     ];
     ids.forEach(id => { DOM[id] = document.getElementById(id); });
     DOM.timetableHeaders = document.querySelectorAll('.timetable thead tr th:not(.time-column)');
@@ -293,10 +295,13 @@ function renderTimetable() {
     // Build rows
     TIME_SLOTS.forEach((time, timeIndex) => {
         const row = document.createElement('tr');
+        const hour = parseInt(time.split(':')[0]);
+        const isWorkHour = hour >= WORK_HOURS.start && hour < WORK_HOURS.end;
 
         // Time cell
         const timeCell = document.createElement('td');
         timeCell.className = 'time-cell';
+        if (isWorkHour) timeCell.classList.add('work-hour');
         timeCell.textContent = TIME_DISPLAY_CACHE[time];
         row.appendChild(timeCell);
 
@@ -306,12 +311,14 @@ function renderTimetable() {
             const cell = document.createElement('td');
 
             if (info.isWeekend) cell.className = 'weekend-cell';
+            else if (isWorkHour) cell.className = 'work-hour-cell';
             if (info.isToday) cell.classList.add('today-cell');
 
             if (info.holiday) {
                 cell.classList.add('holiday-cell');
                 if (timeIndex === 0) {
                     cell.innerHTML = `<div class="holiday-label">
+                        <div class="holiday-name">${info.holiday.name}</div>
                         <div class="holiday-desc">${info.holiday.description}</div>
                     </div>`;
                 }
@@ -327,8 +334,11 @@ function renderTimetable() {
                     if (trainee) {
                         div.style.background = `linear-gradient(135deg, ${trainee.color} 0%, ${adjustColor(trainee.color, -20)} 100%)`;
                     }
+                    const timeRange = session.endTime ? `${session.time}-${session.endTime}` : session.time;
                     div.innerHTML = `<div class="session-title">${escapeHtml(session.title)}</div>
-                        <div class="session-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</div>`;
+                        <div class="session-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</div>
+                        <div class="session-time">${timeRange}</div>
+                        ${session.notes ? `<div class="session-notes">${escapeHtml(session.notes)}</div>` : ''}`;
                     div.onclick = (e) => { e.stopPropagation(); openSessionModal(dayIndex, time, session); };
                     cell.appendChild(div);
                 });
@@ -344,6 +354,9 @@ function renderTimetable() {
 
     DOM.timetableBody.innerHTML = '';
     DOM.timetableBody.appendChild(fragment);
+
+    // Scroll to work hours (9:00) focus area
+    scrollToWorkHours();
 }
 
 // Monthly View Rendering - optimized with single innerHTML assignment
@@ -436,10 +449,12 @@ function renderMonthView() {
                 if (isTodayDate) cellClass += ' today';
 
                 parts.push(`<div class="${cellClass}">`);
-                parts.push(`<div class="month-day-header${holiday ? ' holiday-date' : ''}">${currentDay}${holiday ? ` <span class="month-holiday-title">${holiday.name}</span>` : ''}</div>`);
+                parts.push(`<div class="month-day-header${holiday ? ' holiday-date' : ''}"><span class="month-day-number">${currentDay}</span>${holiday ? `<span class="month-holiday-name">${holiday.name}</span>` : ''}</div>`);
 
                 if (holiday) {
-                    parts.push(`<div class="month-holiday-desc">${holiday.description}</div>`);
+                    parts.push(`<div class="month-holiday-info">
+                        <div class="month-holiday-desc">${holiday.description}</div>
+                    </div>`);
                 } else if (!isWeekend) {
                     // Get bookings using map lookup
                     const dayBookings = state.bookingsByDate.get(dateKey) || [];
@@ -449,8 +464,14 @@ function renderMonthView() {
                         dayBookings.forEach(booking => {
                             const trainee = state.traineeMap.get(booking.traineeId);
                             const statusClass = booking.status === 'present' ? 'status-present' : 'status-planned';
-                            const clickAttr = isPast ? '' : ` onclick="openBookingModal('${dateKey}', '${booking.id}')"`;
-                            parts.push(`<div class="month-booking-item ${statusClass}"${clickAttr}>
+                            // Allow editing past bookings when history is unlocked
+                            const canEdit = !isPast || state.historyUnlocked;
+                            const clickAttr = canEdit ? ` onclick="openBookingModal('${dateKey}', '${booking.id}')"` : '';
+                            // Color coding: 40% opacity for planned, darker for present
+                            const bgColor = trainee
+                                ? (booking.status === 'present' ? adjustColor(trainee.color, -30) : hexToRgba(trainee.color, 0.4))
+                                : '#ccc';
+                            parts.push(`<div class="month-booking-item ${statusClass}" style="background-color: ${bgColor};"${clickAttr}>
                                 <span class="booking-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</span>
                                 <span class="booking-hours">${booking.hours}h</span>
                                 <span class="booking-status">${booking.status}</span>
@@ -459,7 +480,8 @@ function renderMonthView() {
                         parts.push('</div>');
                     }
 
-                    if (!isPast) {
+                    // Show add button for future dates, or past dates when unlocked
+                    if (!isPast || state.historyUnlocked) {
                         parts.push(`<div class="add-booking-btn" onclick="openBookingModal('${dateKey}')">+ Add</div>`);
                     }
                 }
@@ -508,7 +530,10 @@ function canAddHours(traineeId, date, newHours, excludeBookingId = null) {
 
     if (excludeBookingId) {
         const existingBooking = state.dayBookings.find(b => b.id === excludeBookingId);
-        if (existingBooking) currentWeeklyHours -= existingBooking.hours || 0;
+        // Only subtract hours if the existing booking belongs to the same trainee
+        if (existingBooking && existingBooking.traineeId === traineeId) {
+            currentWeeklyHours -= existingBooking.hours || 0;
+        }
     }
 
     return (currentWeeklyHours + newHours) <= MAX_WEEKLY_HOURS;
@@ -524,16 +549,18 @@ function renderTraineeList() {
         // Get all weeks with bookings for this trainee
         const weeksWithBookings = getTraineeWeeksWithBookings(t.id);
 
-        const weeksList = weeksWithBookings.map(w => `
+        const weeksList = weeksWithBookings.map(w => {
+            const exceeds = w.total > MAX_WEEKLY_HOURS;
+            return `
             <div class="trainee-week-row">
                 <span class="trainee-week-label">W${w.weekNum}</span>
                 <div class="trainee-week-stats">
                     <span class="hours-bar present-bar" title="Present">&#10003;${w.present}h</span>
                     <span class="hours-bar planned-bar" title="Planned">&#9679;${w.planned}h</span>
-                    <span class="hours-total-badge">${w.total}/${MAX_WEEKLY_HOURS}h</span>
+                    <span class="hours-total-badge${exceeds ? ' exceeds-limit' : ''}">${w.total}/${MAX_WEEKLY_HOURS}h</span>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
 
         return `
         <div class="trainee-item" data-id="${t.id}">
@@ -724,6 +751,19 @@ function deleteTrainee(id) {
     renderCurrentView();
 }
 
+// Scroll to work hours focus area
+function scrollToWorkHours() {
+    const container = document.querySelector('.timetable-section');
+    if (container && state.currentView === 'week') {
+        // Calculate scroll position to show 9:00 at top
+        const rowHeight = 60; // Approximate row height
+        const scrollTo = WORK_HOURS.start * rowHeight;
+        setTimeout(() => {
+            container.scrollTop = scrollTo;
+        }, 50);
+    }
+}
+
 // Session Management
 function openSessionModal(dayIndex, time, session = null) {
     state.editingSessionId = session ? session.id : null;
@@ -736,11 +776,26 @@ function openSessionModal(dayIndex, time, session = null) {
     DOM.sessionNotes.value = session ? session.notes || '' : '';
     DOM.sessionDay.value = dayIndex;
     DOM.sessionTime.value = time;
+    DOM.sessionEndTime.value = session ? (session.endTime || '') : '';
     DOM.sessionWeek.value = getDateKey(state.currentWeekStart);
     DOM.sessionId.value = session ? session.id : '';
 
+    // Populate time select options
+    populateTimeSelects();
+
     DOM.deleteSessionBtn.classList.toggle('hidden', !session);
     showModal('sessionModal');
+}
+
+// Populate time select dropdowns with 24h options
+function populateTimeSelects() {
+    const timeOptions = TIME_SLOTS.map(t => `<option value="${t}">${TIME_DISPLAY_CACHE[t]}</option>`).join('');
+    if (DOM.sessionTime.options.length !== 24) {
+        DOM.sessionTime.innerHTML = timeOptions;
+    }
+    if (DOM.sessionEndTime.options.length !== 25) {
+        DOM.sessionEndTime.innerHTML = '<option value="">-- End Time --</option>' + timeOptions;
+    }
 }
 
 function handleSessionSubmit(e) {
@@ -751,6 +806,7 @@ function handleSessionSubmit(e) {
     const notes = DOM.sessionNotes.value.trim();
     const day = parseInt(DOM.sessionDay.value);
     const time = DOM.sessionTime.value;
+    const endTime = DOM.sessionEndTime.value || null;
     const week = DOM.sessionWeek.value;
 
     if (!traineeId || !title) return;
@@ -762,9 +818,10 @@ function handleSessionSubmit(e) {
             session.title = title;
             session.type = type;
             session.notes = notes;
+            session.endTime = endTime;
         }
     } else {
-        state.sessions.push({ id: generateId(), traineeId, title, type, notes, day, time, week });
+        state.sessions.push({ id: generateId(), traineeId, title, type, notes, day, time, endTime, week });
     }
 
     saveData();
@@ -837,6 +894,14 @@ function adjustColor(color, amount) {
     const g = clamp(parseInt(hex.substr(2, 2), 16) + amount);
     const b = clamp(parseInt(hex.substr(4, 2), 16) + amount);
     return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+function hexToRgba(color, opacity) {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 // Day Booking Management
@@ -926,9 +991,11 @@ function handleBookingSubmit(e) {
         status = 'planned';
     }
 
+    // Warn if exceeding weekly limit, but allow it
     if (!canAddHours(traineeId, date, hours, bookingId || null)) {
-        alert(`Cannot add ${hours} hours. Would exceed weekly limit of ${MAX_WEEKLY_HOURS} hours for this trainee.`);
-        return;
+        if (!confirm(`This will exceed the ${MAX_WEEKLY_HOURS}h weekly limit for this trainee. Continue anyway?`)) {
+            return;
+        }
     }
 
     if (bookingId) {
@@ -959,8 +1026,27 @@ function deleteBooking() {
     closeModal('bookingModal');
 }
 
+// Toggle history lock for editing past dates
+function toggleHistoryLock() {
+    state.historyUnlocked = !state.historyUnlocked;
+    const icon = DOM.historyLockBtn.querySelector('i');
+    if (state.historyUnlocked) {
+        icon.classList.remove('fa-lock');
+        icon.classList.add('fa-lock-open');
+        DOM.historyLockBtn.classList.add('unlocked');
+        DOM.historyLockBtn.title = 'Lock to prevent editing past dates';
+    } else {
+        icon.classList.remove('fa-lock-open');
+        icon.classList.add('fa-lock');
+        DOM.historyLockBtn.classList.remove('unlocked');
+        DOM.historyLockBtn.title = 'Unlock to edit past dates';
+    }
+    renderCurrentView();
+}
+
 // Global exports for inline handlers
 window.editTrainee = editTrainee;
 window.deleteTrainee = deleteTrainee;
 window.switchView = switchView;
 window.openBookingModal = openBookingModal;
+window.toggleHistoryLock = toggleHistoryLock;

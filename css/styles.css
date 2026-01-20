@@ -79,6 +79,30 @@ body {
     background-color: #b91c1c;
 }
 
+.btn-lock {
+    background-color: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.btn-lock:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.btn-lock.unlocked {
+    background-color: #f59e0b;
+    border-color: #f59e0b;
+    color: white;
+}
+
+.btn-lock.unlocked:hover {
+    background-color: #d97706;
+}
+
 .btn-small {
     padding: 0.375rem 0.75rem;
     font-size: 0.8125rem;
@@ -234,6 +258,12 @@ body {
     border-radius: 3px;
 }
 
+.hours-total-badge.exceeds-limit {
+    color: #dc2626;
+    background: #fee2e2;
+    font-weight: 700;
+}
+
 .trainee-actions {
     display: flex;
     gap: 0.15rem;
@@ -365,7 +395,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
-    overflow: hidden;
+    overflow: auto;
+    max-height: calc(100vh - 180px);
 }
 
 /* Timetable */
@@ -434,6 +465,21 @@ body {
     background: #eff6ff;
 }
 
+/* Work Hours Styles (9:00-18:00) */
+.timetable td.time-cell.work-hour {
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.timetable td.work-hour-cell {
+    background: #eff6ff;
+}
+
+.timetable td.work-hour-cell:hover {
+    background: #dbeafe;
+}
+
 /* Holiday Styles */
 .holiday-header {
     background: #fef2f2 !important;
@@ -452,17 +498,6 @@ body {
 .holiday-label {
     text-align: left;
     padding: 0.25rem;
-}
-
-.holiday-short {
-    display: inline-block;
-    background: #dc2626;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 600;
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    margin-bottom: 0.25rem;
 }
 
 .holiday-name {
@@ -526,6 +561,26 @@ body {
 .session-trainee {
     font-size: 0.6875rem;
     opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-time {
+    font-size: 0.625rem;
+    opacity: 0.85;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.1rem 0.25rem;
+    border-radius: 2px;
+    display: inline-block;
+    margin-top: 0.15rem;
+}
+
+.session-notes {
+    font-size: 0.6rem;
+    opacity: 0.8;
+    font-style: italic;
+    margin-top: 0.15rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -658,6 +713,31 @@ form {
     padding: 0.25rem;
     height: 40px;
     cursor: pointer;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.form-col label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.form-col select {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.875rem;
 }
 
 .form-actions {
@@ -820,6 +900,12 @@ form {
     font-size: 0.9rem;
     font-weight: 600;
     color: #1e293b;
+}
+
+.month-day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
     margin-bottom: 0.25rem;
 }
 
@@ -827,11 +913,18 @@ form {
     color: #dc2626;
 }
 
-.month-holiday-title {
+.month-day-header.holiday-date .month-day-number {
+    color: #dc2626;
+}
+
+.month-holiday-info {
+    margin-top: 0.15rem;
+}
+
+.month-holiday-name {
     font-size: 0.7rem;
     font-weight: 600;
     color: #dc2626;
-    margin-left: 0.25rem;
 }
 
 .month-holiday-desc {
@@ -866,6 +959,8 @@ form {
     margin-bottom: 0.25rem;
     cursor: pointer;
     transition: transform 0.1s ease;
+    color: white;
+    text-shadow: 0 1px 1px rgba(0,0,0,0.2);
 }
 
 .month-booking-item:hover {
@@ -873,15 +968,18 @@ form {
 }
 
 .month-booking-item.status-planned {
-    background: #fef3c7;
-    color: #92400e;
-    border: 1px solid #fcd34d;
+    border: 2px dashed rgba(0,0,0,0.3);
+    color: #1e293b;
+    text-shadow: none;
+}
+
+.month-booking-item.status-planned .booking-hours,
+.month-booking-item.status-planned .booking-status {
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .month-booking-item.status-present {
-    background: #dcfce7;
-    color: #166534;
-    border: 1px solid #86efac;
+    border: 2px solid rgba(0,0,0,0.2);
 }
 
 .booking-trainee {
@@ -891,8 +989,8 @@ form {
 }
 
 .booking-hours {
-    font-weight: 500;
-    background: rgba(0, 0, 0, 0.08);
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.25);
     padding: 0.1rem 0.25rem;
     border-radius: 3px;
 }
@@ -901,7 +999,9 @@ form {
     text-transform: uppercase;
     font-size: 0.55rem;
     font-weight: 600;
-    opacity: 0.8;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.1rem 0.2rem;
+    border-radius: 2px;
 }
 
 .add-booking-btn {
