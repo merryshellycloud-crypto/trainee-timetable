@@ -28,20 +28,21 @@ const state = {
 // Initialize currentWeekStart after function is defined
 state.currentWeekStart = getWeekStart(new Date());
 
-// Time slots for the timetable (8 AM to 6 PM)
-const TIME_SLOTS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+// Time slots for the timetable (24 hours)
+const TIME_SLOTS = [];
+for (let h = 0; h < 24; h++) {
+    TIME_SLOTS.push(`${String(h).padStart(2, '0')}:00`);
+}
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const DAY_NAMES_SHORT = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const WEEKEND_DAYS = new Set([5, 6]);
+const WORK_HOURS = { start: 9, end: 18 }; // Focus area with light blue background
 
 // Pre-formatted time display cache
 const TIME_DISPLAY_CACHE = {};
 TIME_SLOTS.forEach(time => {
-    const [hours, minutes] = time.split(':');
-    const hour = parseInt(hours);
-    const period = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour > 12 ? hour - 12 : hour;
-    TIME_DISPLAY_CACHE[time] = `${displayHour}:${minutes} ${period}`;
+    const hour = parseInt(time.split(':')[0]);
+    TIME_DISPLAY_CACHE[time] = `${String(hour).padStart(2, '0')}:00`;
 });
 
 // Bulgarian Public Holidays 2026
@@ -91,7 +92,7 @@ function cacheDOMElements() {
         'traineeModal', 'sessionModal', 'bookingModal',
         'traineeModalTitle', 'traineeName', 'traineeEmail', 'traineeColor', 'traineeId',
         'sessionModalTitle', 'sessionTrainee', 'sessionTitle', 'sessionType',
-        'sessionNotes', 'sessionDay', 'sessionTime', 'sessionWeek', 'sessionId', 'deleteSessionBtn',
+        'sessionNotes', 'sessionDay', 'sessionTime', 'sessionEndTime', 'sessionWeek', 'sessionId', 'deleteSessionBtn',
         'bookingModalTitle', 'bookingTrainee', 'bookingHours', 'bookingStatus',
         'bookingDate', 'bookingId', 'deleteBookingBtn', 'weeklyHoursInfo',
         'addTraineeBtn', 'exportBtn', 'importBtn', 'importFile', 'prevBtn', 'nextBtn',
@@ -294,10 +295,13 @@ function renderTimetable() {
     // Build rows
     TIME_SLOTS.forEach((time, timeIndex) => {
         const row = document.createElement('tr');
+        const hour = parseInt(time.split(':')[0]);
+        const isWorkHour = hour >= WORK_HOURS.start && hour < WORK_HOURS.end;
 
         // Time cell
         const timeCell = document.createElement('td');
         timeCell.className = 'time-cell';
+        if (isWorkHour) timeCell.classList.add('work-hour');
         timeCell.textContent = TIME_DISPLAY_CACHE[time];
         row.appendChild(timeCell);
 
@@ -307,6 +311,7 @@ function renderTimetable() {
             const cell = document.createElement('td');
 
             if (info.isWeekend) cell.className = 'weekend-cell';
+            else if (isWorkHour) cell.className = 'work-hour-cell';
             if (info.isToday) cell.classList.add('today-cell');
 
             if (info.holiday) {
@@ -329,8 +334,11 @@ function renderTimetable() {
                     if (trainee) {
                         div.style.background = `linear-gradient(135deg, ${trainee.color} 0%, ${adjustColor(trainee.color, -20)} 100%)`;
                     }
+                    const timeRange = session.endTime ? `${session.time}-${session.endTime}` : session.time;
                     div.innerHTML = `<div class="session-title">${escapeHtml(session.title)}</div>
-                        <div class="session-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</div>`;
+                        <div class="session-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</div>
+                        <div class="session-time">${timeRange}</div>
+                        ${session.notes ? `<div class="session-notes">${escapeHtml(session.notes)}</div>` : ''}`;
                     div.onclick = (e) => { e.stopPropagation(); openSessionModal(dayIndex, time, session); };
                     cell.appendChild(div);
                 });
@@ -346,6 +354,9 @@ function renderTimetable() {
 
     DOM.timetableBody.innerHTML = '';
     DOM.timetableBody.appendChild(fragment);
+
+    // Scroll to work hours (9:00) focus area
+    scrollToWorkHours();
 }
 
 // Monthly View Rendering - optimized with single innerHTML assignment
@@ -740,6 +751,19 @@ function deleteTrainee(id) {
     renderCurrentView();
 }
 
+// Scroll to work hours focus area
+function scrollToWorkHours() {
+    const container = document.querySelector('.timetable-section');
+    if (container && state.currentView === 'week') {
+        // Calculate scroll position to show 9:00 at top
+        const rowHeight = 60; // Approximate row height
+        const scrollTo = WORK_HOURS.start * rowHeight;
+        setTimeout(() => {
+            container.scrollTop = scrollTo;
+        }, 50);
+    }
+}
+
 // Session Management
 function openSessionModal(dayIndex, time, session = null) {
     state.editingSessionId = session ? session.id : null;
@@ -752,11 +776,26 @@ function openSessionModal(dayIndex, time, session = null) {
     DOM.sessionNotes.value = session ? session.notes || '' : '';
     DOM.sessionDay.value = dayIndex;
     DOM.sessionTime.value = time;
+    DOM.sessionEndTime.value = session ? (session.endTime || '') : '';
     DOM.sessionWeek.value = getDateKey(state.currentWeekStart);
     DOM.sessionId.value = session ? session.id : '';
 
+    // Populate time select options
+    populateTimeSelects();
+
     DOM.deleteSessionBtn.classList.toggle('hidden', !session);
     showModal('sessionModal');
+}
+
+// Populate time select dropdowns with 24h options
+function populateTimeSelects() {
+    const timeOptions = TIME_SLOTS.map(t => `<option value="${t}">${TIME_DISPLAY_CACHE[t]}</option>`).join('');
+    if (DOM.sessionTime.options.length !== 24) {
+        DOM.sessionTime.innerHTML = timeOptions;
+    }
+    if (DOM.sessionEndTime.options.length !== 25) {
+        DOM.sessionEndTime.innerHTML = '<option value="">-- End Time --</option>' + timeOptions;
+    }
 }
 
 function handleSessionSubmit(e) {
@@ -767,6 +806,7 @@ function handleSessionSubmit(e) {
     const notes = DOM.sessionNotes.value.trim();
     const day = parseInt(DOM.sessionDay.value);
     const time = DOM.sessionTime.value;
+    const endTime = DOM.sessionEndTime.value || null;
     const week = DOM.sessionWeek.value;
 
     if (!traineeId || !title) return;
@@ -778,9 +818,10 @@ function handleSessionSubmit(e) {
             session.title = title;
             session.type = type;
             session.notes = notes;
+            session.endTime = endTime;
         }
     } else {
-        state.sessions.push({ id: generateId(), traineeId, title, type, notes, day, time, week });
+        state.sessions.push({ id: generateId(), traineeId, title, type, notes, day, time, endTime, week });
     }
 
     saveData();

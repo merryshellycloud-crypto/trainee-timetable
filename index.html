@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trainee Timetable</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="css/styles.css?v=108">
+    <link rel="stylesheet" href="css/styles.css?v=109">
 </head>
 <body>
     <div class="app-container">
@@ -141,9 +141,24 @@
                         <option value="other">Other</option>
                     </select>
                 </div>
+                <div class="form-group form-row">
+                    <div class="form-col">
+                        <label for="sessionTime">From</label>
+                        <select id="sessionTime" required>
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <label for="sessionEndTime">To</label>
+                        <select id="sessionEndTime">
+                            <option value="">-- End Time --</option>
+                            <!-- Options populated dynamically -->
+                        </select>
+                    </div>
+                </div>
                 <div class="form-group">
                     <label for="sessionNotes">Notes</label>
-                    <textarea id="sessionNotes" rows="3"></textarea>
+                    <textarea id="sessionNotes" rows="3" placeholder="Add any notes about this session..."></textarea>
                 </div>
                 <div class="form-actions">
                     <button type="button" id="deleteSessionBtn" class="btn btn-danger hidden">Delete</button>
@@ -152,7 +167,6 @@
                 </div>
                 <input type="hidden" id="sessionId">
                 <input type="hidden" id="sessionDay">
-                <input type="hidden" id="sessionTime">
                 <input type="hidden" id="sessionWeek">
             </form>
         </div>
