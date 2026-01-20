@@ -334,6 +334,20 @@ function renderTimetable() {
                     if (trainee) {
                         div.style.background = `linear-gradient(135deg, ${trainee.color} 0%, ${adjustColor(trainee.color, -20)} 100%)`;
                     }
+
+                    // Calculate session duration for multi-hour display
+                    if (session.endTime) {
+                        const startHour = parseInt(session.time.split(':')[0]);
+                        const endHour = parseInt(session.endTime.split(':')[0]);
+                        const duration = endHour - startHour;
+                        if (duration > 1) {
+                            // Multi-hour session - span multiple rows
+                            const rowHeight = 60; // Same as CSS td height
+                            div.classList.add('session-multi-hour');
+                            div.style.height = `${(duration * rowHeight) - 8}px`;
+                        }
+                    }
+
                     const timeRange = session.endTime ? `${session.time}-${session.endTime}` : session.time;
                     div.innerHTML = `<div class="session-title">${escapeHtml(session.title)}</div>
                         <div class="session-trainee">${trainee ? escapeHtml(trainee.name) : 'Unknown'}</div>
@@ -755,9 +769,9 @@ function deleteTrainee(id) {
 function scrollToWorkHours() {
     const container = document.querySelector('.timetable-section');
     if (container && state.currentView === 'week') {
-        // Calculate scroll position to show 9:00 at top
+        // Calculate scroll position to show 8:00 at top
         const rowHeight = 60; // Approximate row height
-        const scrollTo = WORK_HOURS.start * rowHeight;
+        const scrollTo = 8 * rowHeight; // Start from 8:00
         setTimeout(() => {
             container.scrollTop = scrollTo;
         }, 50);

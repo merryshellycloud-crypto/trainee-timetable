@@ -414,10 +414,10 @@ body {
 }
 
 .timetable th {
-    background: #f8fafc;
+    background: #1e40af;
     font-weight: 600;
     font-size: 0.875rem;
-    color: #475569;
+    color: white;
     padding: 0.75rem 0.5rem;
 }
 
@@ -452,8 +452,8 @@ body {
 
 /* Weekend Styles */
 .weekend-header {
-    background: #dbeafe !important;
-    color: #3b82f6 !important;
+    background: #1e3a8a !important;
+    color: #93c5fd !important;
 }
 
 .timetable td.weekend-cell {
@@ -516,7 +516,7 @@ body {
 .header-date {
     font-size: 0.75rem;
     font-weight: 400;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .header-date.holiday-date {
@@ -584,6 +584,23 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* Multi-hour session spanning */
+.session-item.session-multi-hour {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 4px;
+    z-index: 10;
+    overflow: hidden;
+}
+
+.session-item.session-multi-hour .session-notes {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 /* Session Type Colors - Blue-based palette */
@@ -771,9 +788,9 @@ form {
     text-align: center;
     font-weight: 600;
     font-size: 0.875rem;
-    color: #475569;
+    color: white;
     padding: 0.5rem;
-    background: #f8fafc;
+    background: #1e40af;
     border-radius: 4px;
 }
 
@@ -784,8 +801,8 @@ form {
 }
 
 .month-header-cell.weekend {
-    background: #dbeafe;
-    color: #3b82f6;
+    background: #1e3a8a;
+    color: #93c5fd;
 }
 
 .month-days-grid {
