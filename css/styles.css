@@ -80,27 +80,36 @@ body {
 }
 
 .btn-lock {
-    background-color: rgba(255, 255, 255, 0.15);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    padding: 0.4rem 0.6rem;
-    font-size: 0.9rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
+    background: white;
+    color: #3b82f6;
+    border: 1px solid #bfdbfe;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1rem;
 }
 
 .btn-lock:hover {
-    background-color: rgba(255, 255, 255, 0.25);
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
 }
 
 .btn-lock.unlocked {
-    background-color: #f59e0b;
+    background: #f59e0b;
     border-color: #f59e0b;
     color: white;
 }
 
 .btn-lock.unlocked:hover {
-    background-color: #d97706;
+    background: #d97706;
+    border-color: #d97706;
 }
 
 .btn-small {

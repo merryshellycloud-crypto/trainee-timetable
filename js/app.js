@@ -332,7 +332,8 @@ function renderTimetable() {
                     const div = document.createElement('div');
                     div.className = `session-item session-type-${session.type}`;
                     if (trainee) {
-                        div.style.background = `linear-gradient(135deg, ${trainee.color} 0%, ${adjustColor(trainee.color, -20)} 100%)`;
+                        // Use 66% transparency for softer colors
+                        div.style.background = hexToRgba(trainee.color, 0.66);
                     }
 
                     // Calculate session duration for multi-hour display
