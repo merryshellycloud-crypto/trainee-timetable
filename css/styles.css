@@ -395,7 +395,8 @@ body {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     border: 1px solid #e2e8f0;
-    overflow: hidden;
+    overflow: auto;
+    max-height: calc(100vh - 180px);
 }
 
 /* Timetable */
@@ -462,6 +463,21 @@ body {
 
 .timetable td.weekend-cell:hover {
     background: #eff6ff;
+}
+
+/* Work Hours Styles (9:00-18:00) */
+.timetable td.time-cell.work-hour {
+    background: #dbeafe;
+    color: #1e40af;
+    font-weight: 600;
+}
+
+.timetable td.work-hour-cell {
+    background: #eff6ff;
+}
+
+.timetable td.work-hour-cell:hover {
+    background: #dbeafe;
 }
 
 /* Holiday Styles */
@@ -545,6 +561,26 @@ body {
 .session-trainee {
     font-size: 0.6875rem;
     opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.session-time {
+    font-size: 0.625rem;
+    opacity: 0.85;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 0.1rem 0.25rem;
+    border-radius: 2px;
+    display: inline-block;
+    margin-top: 0.15rem;
+}
+
+.session-notes {
+    font-size: 0.6rem;
+    opacity: 0.8;
+    font-style: italic;
+    margin-top: 0.15rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -677,6 +713,31 @@ form {
     padding: 0.25rem;
     height: 40px;
     cursor: pointer;
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.form-col label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.form-col select {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.875rem;
 }
 
 .form-actions {
